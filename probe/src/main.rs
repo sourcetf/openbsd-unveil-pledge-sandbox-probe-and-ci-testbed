@@ -171,6 +171,15 @@ fn main() {
     // 原始套接字（Stalwart 的 ICMP 代理要用）：promise 不含它进程会被直接杀掉
     step("raw icmp socket", raw_icmp(), &mut failures);
 
+    // 出站连接（SMTP 投递、S3/Azure、LDAP/OIDC、Redis/NATS/Kafka、OTLP）
+    step("outbound tcp connect", outbound_connect(), &mut failures);
+    // DNS 查询（MX/PTR/自定义 resolver）：走 udp 53 + dns 承诺
+    step("dns query via resolver", dns_query(), &mut failures);
+    // 随机数（TLS / DKIM / 各种密钥）
+    step("getrandom from /dev/urandom", urandom(), &mut failures);
+    // 文件锁与落盘（RocksDB / SQLite 的常态）
+    step("flock + fsync on store file", flock_and_fsync(), &mut failures);
+
     // 只读的系统文件（unveil "/" r 覆盖）
     step(
         "read /etc/resolv.conf",
@@ -376,6 +385,85 @@ fn strict_mode_check() -> Result<String, String> {
         return Err("strict mode must deny paths outside the standard list".to_string());
     }
     Ok("strict denies unlisted reads, default does not".to_string())
+}
+
+/// 出站 TCP：连本机的监听端口（等价于服务器主动往外连的那种 socket 用法）
+fn outbound_connect() -> Result<String, String> {
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").map_err(|e| e.to_string())?;
+    let addr = listener.local_addr().map_err(|e| e.to_string())?;
+    let handle = std::thread::spawn(move || {
+        let _ = listener.accept();
+    });
+    let stream = std::net::TcpStream::connect(addr).map_err(|e| e.to_string())?;
+    stream.set_nonblocking(true).ok();
+    let peer = stream.peer_addr().map_err(|e| e.to_string())?;
+    let _ = handle.join();
+    Ok(format!("connected to {peer}"))
+}
+
+/// 用 /etc/resolv.conf 里的服务器发一次真实 DNS 查询（A 记录、UDP）
+fn dns_query() -> Result<String, String> {
+    let resolv = std::fs::read_to_string("/etc/resolv.conf").map_err(|e| e.to_string())?;
+    let server = resolv
+        .lines()
+        .find_map(|line| line.trim().strip_prefix("nameserver "))
+        .map(|s| s.trim().to_string())
+        .ok_or_else(|| "no nameserver in /etc/resolv.conf".to_string())?;
+
+    let socket = std::net::UdpSocket::bind("0.0.0.0:0").map_err(|e| e.to_string())?;
+    socket
+        .set_read_timeout(Some(std::time::Duration::from_secs(5)))
+        .map_err(|e| e.to_string())?;
+
+    // 手搓一个最小的 A 查询：example.com
+    let mut query = vec![
+        0x12, 0x34, // id
+        0x01, 0x00, // flags: RD
+        0x00, 0x01, // qdcount
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    ];
+    for label in ["example", "com"] {
+        query.push(label.len() as u8);
+        query.extend_from_slice(label.as_bytes());
+    }
+    query.extend_from_slice(&[0x00, 0x00, 0x01, 0x00, 0x01]);
+
+    socket
+        .send_to(&query, format!("{server}:53"))
+        .map_err(|e| e.to_string())?;
+    let mut buf = [0u8; 512];
+    let (len, from) = socket.recv_from(&mut buf).map_err(|e| e.to_string())?;
+    Ok(format!("{len} bytes from {from}"))
+}
+
+/// TLS/密钥需要的内核随机数
+fn urandom() -> Result<String, String> {
+    use std::io::Read;
+    let mut file = std::fs::File::open("/dev/urandom").map_err(|e| e.to_string())?;
+    let mut buf = [0u8; 32];
+    file.read_exact(&mut buf).map_err(|e| e.to_string())?;
+    Ok("32 bytes".to_string())
+}
+
+/// RocksDB / SQLite 会用的文件锁 + 落盘
+fn flock_and_fsync() -> Result<String, String> {
+    use std::os::unix::io::AsRawFd;
+    let dir = std::env::temp_dir().join("probe-lock");
+    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    let path = dir.join("LOCK");
+    let file = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(&path)
+        .map_err(|e| e.to_string())?;
+    let rc = unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX) };
+    if rc != 0 {
+        return Err(std::io::Error::last_os_error().to_string());
+    }
+    file.sync_all().map_err(|e| e.to_string())?;
+    unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_UN) };
+    Ok("locked, synced, unlocked".to_string())
 }
 
 fn mkstemp() -> Result<String, String> {
