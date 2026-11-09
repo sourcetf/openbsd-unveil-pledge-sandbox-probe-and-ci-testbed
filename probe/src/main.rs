@@ -98,12 +98,19 @@ fn main() {
         }
     }
 
-    // 相对路径登记必须在锁定之前：沙箱要把它解析成启动时 cwd 下的绝对路径
+    // 以下三项都必须在主进程锁定 unveil 之前跑：unveil 一旦锁定不可逆，
+    // fork 出来的子进程会继承锁定状态，所以每项都自己 fork 一个干净子进程。
+    //
+    // 1) 相对路径登记：应解析成启动时 cwd 下的绝对路径
     step(
         "relative path registration",
         relative_write(&mut sandbox),
         &mut failures,
     );
+    // 2) 多级目录都不存在（首次安装）：目录要能建出来，而且要写得进去
+    step("multi-level missing dir", multi_level_missing(), &mut failures);
+    // 3) 严格读模式：标准清单可读、未登记路径被拒；默认模式两者都可读
+    step("strict mode read policy", strict_mode_check(), &mut failures);
 
     // 内核行为探测：unveil 对“还不存在的路径”是什么反应（安装时目录可能还没建）
     probe_unveil_missing();
@@ -228,6 +235,8 @@ fn main() {
         &mut failures,
     );
 
+    // 多级目录都不存在时（首次安装）：目录要能建出来，而且要能写进去
+    // 严格模式 vs 默认模式的读权限对比（各自 fork 一个子进程，unveil 不可逆）
     // 反例：未登记的目录必须写不进去（否则 unveil 没生效）
     let outside = "/var/probe-should-fail";
     match std::fs::write(outside, b"x") {
@@ -282,6 +291,91 @@ fn raw_icmp() -> Result<String, String> {
         libc::close(fd);
         Ok("raw ICMP socket created and closed".to_string())
     }
+}
+
+/// 模拟首次安装：数据目录有两级都不存在，父目录只有 create 权限。
+/// 需要验证「目录能建出来」且「建好之后写得进去」。
+fn multi_level_missing() -> Result<String, String> {
+    let base = std::env::temp_dir().join("probe-missing");
+    let target = base.join("a/b");
+    let target_str = target.to_string_lossy().into_owned();
+
+    let pid = unsafe { libc::fork() };
+    if pid == 0 {
+        let mut sandbox = SandboxPaths::from_env();
+        sandbox.allow_write(&target_str);
+        let code = (|| -> i32 {
+            if sandbox.lock_filesystem().is_err() {
+                return 11;
+            }
+            if std::fs::create_dir_all(&target_str).is_err() {
+                return 12;
+            }
+            if std::fs::write(target.join("db.sst"), b"x").is_err() {
+                return 13;
+            }
+            match std::fs::read(target.join("db.sst")) {
+                Ok(bytes) => bytes.len() as i32,
+                Err(_) => 14,
+            }
+        })();
+        unsafe { libc::_exit(code) };
+    }
+    let mut status = 0;
+    unsafe { libc::waitpid(pid, &mut status, 0) };
+    let code = (status >> 8) & 0xff;
+    match code {
+        1 => Ok("created missing chain and wrote 1 byte".to_string()),
+        11 => Err("lock_filesystem failed".to_string()),
+        12 => Err("cannot create the missing directory chain".to_string()),
+        13 => Err("directory created but writing into it was denied".to_string()),
+        14 => Err("wrote but could not read back".to_string()),
+        other => Err(format!("unexpected exit {other}")),
+    }
+}
+
+/// 对比默认与严格模式的读权限：
+///   默认：/etc/ssh/sshd_config 这种没登记的路径也能读（"/" r）
+///   严格：只有标准清单 + 登记过的读路径可读
+fn strict_mode_check() -> Result<String, String> {
+    let probe = |strict: bool| -> Result<(bool, bool), String> {
+        let pid = unsafe { libc::fork() };
+        if pid == 0 {
+            unsafe { std::env::set_var("STALWART_UNVEIL_STRICT", if strict { "on" } else { "off" }) };
+            let mut sandbox = SandboxPaths::from_env();
+            sandbox.allow_write("/tmp");
+            let _ = sandbox.lock_filesystem();
+            let listed = std::fs::read_to_string("/etc/passwd").is_ok();
+            let unlisted = std::fs::read_to_string("/etc/ssh/sshd_config").is_ok();
+            unsafe { libc::_exit((listed as i32) | ((unlisted as i32) << 1)) };
+        }
+        let mut status = 0;
+        unsafe { libc::waitpid(pid, &mut status, 0) };
+        let code = (status >> 8) & 0xff;
+        if code > 3 {
+            return Err(format!("child exited with {code}"));
+        }
+        Ok((code & 1 != 0, code & 2 != 0))
+    };
+
+    let (default_listed, default_unlisted) = probe(false)?;
+    let (strict_listed, strict_unlisted) = probe(true)?;
+    println!(
+        "       default: /etc/passwd={default_listed} /etc/ssh/sshd_config={default_unlisted}"
+    );
+    println!(
+        "       strict : /etc/passwd={strict_listed} /etc/ssh/sshd_config={strict_unlisted}"
+    );
+    if !default_listed || !default_unlisted {
+        return Err("default mode should allow reading both".to_string());
+    }
+    if !strict_listed {
+        return Err("strict mode must still allow the standard paths".to_string());
+    }
+    if strict_unlisted {
+        return Err("strict mode must deny paths outside the standard list".to_string());
+    }
+    Ok("strict denies unlisted reads, default does not".to_string())
 }
 
 fn mkstemp() -> Result<String, String> {
