@@ -10,6 +10,50 @@
 mod sandbox;
 
 // libc crate 只在 openbsd target 上导出 pledge，这里自己声明一份，方便本地类型检查
+
+/// 探查 unveil(2) 对不存在的路径的行为——这决定“首次安装时目录还没建”会不会起不来。
+fn probe_unveil_missing() {
+    // 注意：unveil 是全局累加的，这里只能用一次性进程来测
+    for path in [
+        "/tmp/probe-missing-parent-xyz/child",
+        "/tmp/definitely-not-there-xyz",
+    ] {
+        let pid = unsafe { libc::fork() };
+        if pid == 0 {
+            let code = match std::ffi::CString::new(path) {
+                Ok(p) => {
+                    let perms = std::ffi::CString::new("rwc").unwrap();
+                    let rc = unsafe { unveil(p.as_ptr(), perms.as_ptr()) };
+                    if rc == 0 {
+                        0
+                    } else {
+                        let errno = std::io::Error::last_os_error();
+                        eprintln!("      unveil({path}) -> {errno}");
+                        if errno.raw_os_error() == Some(2) { 2 } else { 3 }
+                    }
+                }
+                Err(_) => 9,
+            };
+            unsafe { libc::_exit(code) };
+        }
+        let mut status = 0;
+        unsafe { libc::waitpid(pid, &mut status, 0) };
+        let code = (status >> 8) & 0xff;
+        println!(
+            "  note unveil missing path {path}: {}",
+            match code {
+                0 => "accepted (ENOENT 不是问题)".to_string(),
+                2 => "rejected with ENOENT".to_string(),
+                other => format!("rejected with exit {other}"),
+            }
+        );
+    }
+}
+
+extern "C" {
+    fn unveil(path: *const libc::c_char, permissions: *const libc::c_char) -> libc::c_int;
+}
+
 extern "C" {
     fn pledge(promises: *const libc::c_char, execpromises: *const libc::c_char) -> libc::c_int;
 }
@@ -60,6 +104,9 @@ fn main() {
         relative_write(&mut sandbox),
         &mut failures,
     );
+
+    // 内核行为探测：unveil 对“还不存在的路径”是什么反应（安装时目录可能还没建）
+    probe_unveil_missing();
 
     if let Err(err) = sandbox.lock_filesystem() {
         println!("  FAIL unveil: {err}");
@@ -113,6 +160,9 @@ fn main() {
             .map_err(|err| err.to_string()),
         &mut failures,
     );
+
+    // 原始套接字（Stalwart 的 ICMP 代理要用）：promise 不含它进程会被直接杀掉
+    step("raw icmp socket", raw_icmp(), &mut failures);
 
     // 只读的系统文件（unveil "/" r 覆盖）
     step(
@@ -220,6 +270,18 @@ fn check_promises() -> Vec<(String, bool)> {
             (promise.to_string(), status == 0)
         })
         .collect()
+}
+
+/// 原始套接字：ICMP 代理要用。若承诺集不允许，进程会被内核杀掉（不是返回错误）。
+fn raw_icmp() -> Result<String, String> {
+    unsafe {
+        let fd = libc::socket(libc::AF_INET, libc::SOCK_RAW, libc::IPPROTO_ICMP);
+        if fd < 0 {
+            return Err(std::io::Error::last_os_error().to_string());
+        }
+        libc::close(fd);
+        Ok("raw ICMP socket created and closed".to_string())
+    }
 }
 
 fn mkstemp() -> Result<String, String> {
