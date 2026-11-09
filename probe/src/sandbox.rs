@@ -48,8 +48,6 @@ pub struct SandboxPaths {
     strict: bool,
     read: Vec<String>,
     write: Vec<String>,
-    /// 只需要 create/unlink 的目录（可写路径的父目录）
-    create: Vec<String>,
     exec: Vec<String>,
     chroot: Option<String>,
     pledge: Option<String>,
@@ -135,11 +133,14 @@ impl SandboxPaths {
         push_unique(&mut self.read, path.as_ref());
     }
 
-    /// 登记一个可写路径。
+    /// 登记一个可写路径。父目录一并登记为 `rwc`：
     ///
-    /// 只对这条路径本身给 `rwc`；父目录只给 `c`（create/unlink）——存储目录往往
-    /// 还不存在，创建/替换它需要在父目录里有创建权限，但没必要把整个父目录的
-    /// 读写子树都放开。
+    /// * 存储目录往往还不存在，创建它需要父目录的创建权限；
+    /// * 有些组件会在父目录里创建“兄弟文件”（mkstemp 的临时文件、SQLite 的
+    ///   `-wal`/`-journal`），这些都要能写；
+    /// * unveil 对同一路径是“最后一次调用覆盖前面的”，所以父目录不能只给 `c`：
+    ///   一旦某个更宽的登记把父目录降级，前面给的权限就没了（实测会让 mkstemp
+    ///   和多级缺失目录的写入一起失败）。
     pub fn allow_write(&mut self, path: impl AsRef<str>) {
         if !self.enabled {
             return;
@@ -149,7 +150,7 @@ impl SandboxPaths {
         if let Some(parent) = std::path::Path::new(path.trim_end_matches('/')).parent() {
             let parent = parent.to_string_lossy().into_owned();
             if parent.starts_with('/') && parent != "/" {
-                push_unique(&mut self.create, &parent);
+                push_unique(&mut self.write, &parent);
             }
         }
     }
@@ -223,11 +224,6 @@ impl SandboxPaths {
                     Err(err) => return Err(format!("unveil({path}, rwc): {err}")),
                 }
             }
-            for path in &self.create {
-                if let Err(err) = unveil(path, "c") {
-                    eprintln!("OpenBSD sandbox: warning: unveil({path}, c): {err}");
-                }
-            }
             for path in &self.exec {
                 unveil(path, "rx")?;
             }
@@ -281,7 +277,7 @@ impl SandboxPaths {
         if let Some(jail) = &self.chroot {
             let _ = std::fmt::Write::write_fmt(&mut out, format_args!(", chroot({jail})"));
         }
-        for (label, list) in [("rwc", &self.write), ("c", &self.create), ("rx", &self.exec)] {
+        for (label, list) in [("rwc", &self.write), ("rx", &self.exec)] {
             if !list.is_empty() {
                 let _ = std::fmt::Write::write_fmt(
                     &mut out,
