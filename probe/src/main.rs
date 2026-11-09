@@ -31,11 +31,18 @@ fn main() {
         "STALWART_UNVEIL_EXTRA",
         format!("{data_dir}:rwc,/bin/echo:rx,/bin/sh:rx"),
     );
-    let sandbox = SandboxPaths::from_env();
+    let mut sandbox = SandboxPaths::from_env();
     println!("sandbox: {}", sandbox.describe());
     assert!(sandbox.is_enabled(), "sandbox should be enabled on OpenBSD");
 
     let mut failures = Vec::new();
+
+    // 相对路径登记必须在锁定之前：沙箱要把它解析成启动时 cwd 下的绝对路径
+    step(
+        "relative path registration",
+        relative_write(&mut sandbox),
+        &mut failures,
+    );
 
     if let Err(err) = sandbox.lock_filesystem() {
         println!("  FAIL unveil: {err}");
@@ -147,6 +154,13 @@ fn main() {
         &mut failures,
     );
 
+    // mkstemp：需要 tmppath 承诺 + 临时目录可写
+    step(
+        "mkstemp in temp dir",
+        mkstemp(),
+        &mut failures,
+    );
+
     // 反例：未登记的目录必须写不进去（否则 unveil 没生效）
     let outside = "/var/probe-should-fail";
     match std::fs::write(outside, b"x") {
@@ -168,6 +182,48 @@ fn main() {
         }
         std::process::exit(1);
     }
+}
+
+fn mkstemp() -> Result<String, String> {
+    let dir = std::env::temp_dir();
+    let mut template: Vec<u8> = format!("{}/probe-XXXXXX", dir.display()).into_bytes();
+    template.push(0);
+    unsafe {
+        let fd = libc::mkstemp(template.as_mut_ptr() as *mut libc::c_char);
+        if fd < 0 {
+            return Err(std::io::Error::last_os_error().to_string());
+        }
+        let path = std::ffi::CStr::from_ptr(template.as_ptr() as *const libc::c_char)
+            .to_string_lossy()
+            .into_owned();
+        libc::close(fd);
+        let _ = std::fs::remove_file(&path);
+        Ok(path)
+    }
+}
+
+/// 在 /tmp 下起一个子进程？不行——直接验证：把 cwd 切到临时目录，
+/// 用相对路径登记一个目录，沙箱应把它解析成绝对路径并允许写入。
+fn relative_write(sandbox: &mut SandboxPaths) -> Result<String, String> {
+    let base = std::env::temp_dir().join("probe-relative");
+    std::fs::create_dir_all(&base).map_err(|err| err.to_string())?;
+    std::env::set_current_dir(&base).map_err(|err| err.to_string())?;
+    std::fs::create_dir_all("data").map_err(|err| err.to_string())?;
+
+    sandbox.allow_write("data");
+    let expected = base.join("data");
+    if !sandbox
+        .write_paths()
+        .iter()
+        .any(|path| path == &expected.to_string_lossy())
+    {
+        return Err(format!(
+            "relative path was not resolved to {} (got {:?})",
+            expected.display(),
+            sandbox.write_paths()
+        ));
+    }
+    Ok(format!("resolved to {}", expected.display()))
 }
 
 fn getpw() -> Result<String, String> {
