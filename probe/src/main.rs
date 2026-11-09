@@ -173,8 +173,9 @@ fn main() {
 
     // 出站连接（SMTP 投递、S3/Azure、LDAP/OIDC、Redis/NATS/Kafka、OTLP）
     step("outbound tcp connect", outbound_connect(), &mut failures);
-    // DNS 查询（MX/PTR/自定义 resolver）：走 udp 53 + dns 承诺
-    step("dns query via resolver", dns_query(), &mut failures);
+    // DNS：先测纯 UDP 收发（不经过 getaddrinfo），再测名字解析（MX/PTR 要用）
+    step("udp send/recv to resolver", dns_udp(), &mut failures);
+    step("getaddrinfo(name)", dns_lookup(), &mut failures);
     // 随机数（TLS / DKIM / 各种密钥）
     step("getrandom from /dev/urandom", urandom(), &mut failures);
     // 文件锁与落盘（RocksDB / SQLite 的常态）
@@ -402,6 +403,52 @@ fn outbound_connect() -> Result<String, String> {
 }
 
 /// 用 /etc/resolv.conf 里的服务器发一次真实 DNS 查询（A 记录、UDP）
+fn resolver_addr() -> Result<std::net::SocketAddr, String> {
+    let resolv = std::fs::read_to_string("/etc/resolv.conf").map_err(|e| e.to_string())?;
+    let server = resolv
+        .lines()
+        .find_map(|line| line.trim().strip_prefix("nameserver "))
+        .map(|s| s.trim().to_string())
+        .ok_or_else(|| "no nameserver in /etc/resolv.conf".to_string())?;
+    format!("{server}:53")
+        .parse::<std::net::SocketAddr>()
+        .map_err(|e| format!("cannot parse {server}:53: {e}"))
+}
+
+fn dns_packet() -> Vec<u8> {
+    let mut query = vec![0x12, 0x34, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+    for label in ["example", "com"] {
+        query.push(label.len() as u8);
+        query.extend_from_slice(label.as_bytes());
+    }
+    query.extend_from_slice(&[0x00, 0x00, 0x01, 0x00, 0x01]);
+    query
+}
+
+/// 纯 UDP 收发（SocketAddr 直接构造，不触发 getaddrinfo）
+fn dns_udp() -> Result<String, String> {
+    let addr = resolver_addr()?;
+    let socket = std::net::UdpSocket::bind("0.0.0.0:0").map_err(|e| e.to_string())?;
+    socket
+        .set_read_timeout(Some(std::time::Duration::from_secs(5)))
+        .map_err(|e| e.to_string())?;
+    socket.send_to(&dns_packet(), addr).map_err(|e| e.to_string())?;
+    let mut buf = [0u8; 512];
+    let (len, from) = socket.recv_from(&mut buf).map_err(|e| e.to_string())?;
+    Ok(format!("{len} bytes from {from}"))
+}
+
+/// getaddrinfo 名字解析（MX/PTR/ACME/OTLP 等都要用）
+fn dns_lookup() -> Result<String, String> {
+    use std::net::ToSocketAddrs;
+    let addrs: Vec<_> = ("example.com", 80)
+        .to_socket_addrs()
+        .map_err(|e| format!("{e}"))?
+        .collect();
+    Ok(format!("resolved to {} address(es)", addrs.len()))
+}
+
+#[allow(dead_code)]
 fn dns_query() -> Result<String, String> {
     let resolv = std::fs::read_to_string("/etc/resolv.conf").map_err(|e| e.to_string())?;
     let server = resolv
