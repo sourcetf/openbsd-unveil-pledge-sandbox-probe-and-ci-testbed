@@ -9,6 +9,11 @@
 
 mod sandbox;
 
+// libc crate 只在 openbsd target 上导出 pledge，这里自己声明一份，方便本地类型检查
+extern "C" {
+    fn pledge(promises: *const libc::c_char, execpromises: *const libc::c_char) -> libc::c_int;
+}
+
 use sandbox::{SandboxPaths, DEFAULT_PLEDGE};
 use std::io::Write;
 
@@ -36,6 +41,17 @@ fn main() {
     assert!(sandbox.is_enabled(), "sandbox should be enabled on OpenBSD");
 
     let mut failures = Vec::new();
+
+    // 逐个承诺做诊断：fork 一个子进程单独 pledge 它，看内核对哪个返回 EINVAL
+    println!("  -- per-promise check --");
+    for (promise, accepted) in check_promises() {
+        if accepted {
+            println!("  ok   promise {promise}");
+        } else {
+            println!("  FAIL promise {promise}: rejected by kernel");
+            failures.push(format!("promise {promise} rejected"));
+        }
+    }
 
     // 相对路径登记必须在锁定之前：沙箱要把它解析成启动时 cwd 下的绝对路径
     step(
@@ -182,6 +198,27 @@ fn main() {
         }
         std::process::exit(1);
     }
+}
+
+/// 逐个验证 promise 是否被当前内核接受（fork 子进程，避免污染主进程的 pledge 状态）。
+fn check_promises() -> Vec<(String, bool)> {
+    DEFAULT_PLEDGE
+        .split_whitespace()
+        .map(|promise| {
+            let pid = unsafe { libc::fork() };
+            if pid == 0 {
+                let c = match std::ffi::CString::new(promise) {
+                    Ok(c) => c,
+                    Err(_) => unsafe { libc::_exit(2) },
+                };
+                let rc = unsafe { pledge(c.as_ptr(), std::ptr::null()) };
+                unsafe { libc::_exit(if rc == 0 { 0 } else { 1 }) };
+            }
+            let mut status = 0;
+            unsafe { libc::waitpid(pid, &mut status, 0) };
+            (promise.to_string(), status == 0)
+        })
+        .collect()
 }
 
 fn mkstemp() -> Result<String, String> {
