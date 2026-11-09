@@ -201,7 +201,7 @@ impl SandboxPaths {
                 unveil(path, "r")?;
             }
             for path in &self.write {
-                match unveil(path, "rwc") {
+                match unveil_raw(path, "rwc") {
                     Ok(()) => {}
                     Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
                         // 路径里有还没建的中间目录（首次安装很常见）。unveil 要求除最后
@@ -391,14 +391,22 @@ fn cstr(value: &str) -> Result<std::ffi::CString, String> {
 }
 
 #[cfg(target_os = "openbsd")]
-fn unveil(path: &str, perms: &str) -> Result<(), String> {
-    let path_c = cstr(path)?;
-    let perms_c = cstr(perms)?;
+fn unveil_raw(path: &str, perms: &str) -> Result<(), std::io::Error> {
+    let path_c = cstr_io(path)?;
+    let perms_c = cstr_io(perms)?;
     if unsafe { libc::unveil(path_c.as_ptr(), perms_c.as_ptr()) } != 0 {
-        return Err(format!(
-            "unveil({path}, {perms}): {}",
-            std::io::Error::last_os_error()
-        ));
+        return Err(std::io::Error::last_os_error());
     }
     Ok(())
+}
+
+#[cfg(target_os = "openbsd")]
+fn unveil(path: &str, perms: &str) -> Result<(), String> {
+    unveil_raw(path, perms).map_err(|err| format!("unveil({path}, {perms}): {err}"))
+}
+
+#[cfg(target_os = "openbsd")]
+fn cstr_io(value: &str) -> Result<std::ffi::CString, std::io::Error> {
+    std::ffi::CString::new(value)
+        .map_err(|_| std::io::Error::from(std::io::ErrorKind::InvalidInput))
 }
