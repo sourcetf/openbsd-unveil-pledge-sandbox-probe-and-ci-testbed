@@ -1,0 +1,37 @@
+name: openbsd-sandbox-probe
+
+# 用 GitHub 的 OpenBSD VM 验证 unveil(2)/pledge(2) 策略是否适用于 Stalwart 运行时
+# 会做的操作。比在 stm 里等完整的 90 分钟构建快得多（这里只编一个小程序）。
+#
+# 手动触发，或 push 时触发。
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  probe:
+    name: Probe / x86_64-unknown-openbsd
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Probe on OpenBSD 7.9 VM
+        uses: vmactions/openbsd-vm@v1
+        with:
+          release: "7.9"
+          usesh: true
+          mem: 2048
+          cpu: 2
+          prepare: |
+            set -e
+            RELEASE_PKG="https://cdn.openbsd.org/pub/OpenBSD/7.9/packages/amd64"
+            pkg_add -Iv -m "$RELEASE_PKG" rust
+            rustc --version
+          run: |
+            set -e
+            cd probe
+            cargo build --release
+            ./target/release/probe
