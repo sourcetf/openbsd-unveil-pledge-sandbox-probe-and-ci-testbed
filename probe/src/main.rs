@@ -405,10 +405,16 @@ fn outbound_connect() -> Result<String, String> {
 /// 用 /etc/resolv.conf 里的服务器发一次真实 DNS 查询（A 记录、UDP）
 fn resolver_addr() -> Result<std::net::SocketAddr, String> {
     let resolv = std::fs::read_to_string("/etc/resolv.conf").map_err(|e| e.to_string())?;
+    // OpenBSD 的 resolv.conf 行尾可能带注释（"nameserver 1.2.3.4 # resolvd: vio0"），只取第二个字段
     let server = resolv
         .lines()
-        .find_map(|line| line.trim().strip_prefix("nameserver "))
-        .map(|s| s.trim().to_string())
+        .find_map(|line| {
+            let mut parts = line.split_whitespace();
+            match (parts.next(), parts.next()) {
+                (Some("nameserver"), Some(addr)) => Some(addr.to_string()),
+                _ => None,
+            }
+        })
         .ok_or_else(|| "no nameserver in /etc/resolv.conf".to_string())?;
     format!("{server}:53")
         .parse::<std::net::SocketAddr>()
@@ -448,40 +454,6 @@ fn dns_lookup() -> Result<String, String> {
     Ok(format!("resolved to {} address(es)", addrs.len()))
 }
 
-#[allow(dead_code)]
-fn dns_query() -> Result<String, String> {
-    let resolv = std::fs::read_to_string("/etc/resolv.conf").map_err(|e| e.to_string())?;
-    let server = resolv
-        .lines()
-        .find_map(|line| line.trim().strip_prefix("nameserver "))
-        .map(|s| s.trim().to_string())
-        .ok_or_else(|| "no nameserver in /etc/resolv.conf".to_string())?;
-
-    let socket = std::net::UdpSocket::bind("0.0.0.0:0").map_err(|e| e.to_string())?;
-    socket
-        .set_read_timeout(Some(std::time::Duration::from_secs(5)))
-        .map_err(|e| e.to_string())?;
-
-    // 手搓一个最小的 A 查询：example.com
-    let mut query = vec![
-        0x12, 0x34, // id
-        0x01, 0x00, // flags: RD
-        0x00, 0x01, // qdcount
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    ];
-    for label in ["example", "com"] {
-        query.push(label.len() as u8);
-        query.extend_from_slice(label.as_bytes());
-    }
-    query.extend_from_slice(&[0x00, 0x00, 0x01, 0x00, 0x01]);
-
-    socket
-        .send_to(&query, format!("{server}:53"))
-        .map_err(|e| e.to_string())?;
-    let mut buf = [0u8; 512];
-    let (len, from) = socket.recv_from(&mut buf).map_err(|e| e.to_string())?;
-    Ok(format!("{len} bytes from {from}"))
-}
 
 /// TLS/密钥需要的内核随机数
 fn urandom() -> Result<String, String> {
