@@ -29,9 +29,10 @@
 use std::fmt;
 
 /// 默认 pledge 承诺集：覆盖邮件服务器的常见需求（文件、网络、DNS、UNIX socket、
-/// 读取用户/组信息、fork/exec 脚本插件、伪终端、进程/内存信息，以及 mkstemp
-/// 需要的 tmppath）。
-pub const DEFAULT_PLEDGE: &str = "stdio rpath wpath cpath dpath tmppath fattr flock inet unix dns getpw id proc exec tty ps vminfo";
+/// 读取用户/组信息、fork/exec 脚本插件、伪终端、进程/内存信息）。
+/// 逐一在 OpenBSD 7.9 上验证过：这些名字都被内核接受（`tmppath` 已被移除，
+/// 7.9 上 pledge 会报 EINVAL，不要加）。
+pub const DEFAULT_PLEDGE: &str = "stdio rpath wpath cpath dpath fattr flock inet unix dns getpw id proc exec tty ps vminfo";
 
 #[derive(Debug, Default, Clone)]
 #[cfg_attr(not(target_os = "openbsd"), allow(dead_code))]

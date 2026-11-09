@@ -48,8 +48,9 @@ fn main() {
         if accepted {
             println!("  ok   promise {promise}");
         } else {
-            println!("  FAIL promise {promise}: rejected by kernel");
-            failures.push(format!("promise {promise} rejected"));
+            // 只作参考：不同 OpenBSD 版本的承诺集不同（例如 tmppath 已移除），
+            // 真正的门槛是下面那次完整 pledge
+            println!("  note promise {promise}: not accepted by this kernel");
         }
     }
 
