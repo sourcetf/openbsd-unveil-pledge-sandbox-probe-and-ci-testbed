@@ -489,13 +489,13 @@ fn flock_and_fsync() -> Result<String, String> {
     Ok("locked, synced, unlocked".to_string())
 }
 
-/// 在子进程里验证：chroot 之后 unveil 用 jail 内路径是否生效、写是否被限制、
-/// /dev/urandom 与 /etc/passwd 是否能读到。
+/// 在子进程里验证 chroot 语义。用「写步骤标记到 jail 内文件」定位失败点，
+/// 并区分“正常退出”与“被信号杀死”（fork 后的子进程崩溃时 exit code 会是 0）。
 fn chroot_probe() -> Result<String, String> {
     let base = std::env::temp_dir().join("probe-jail");
     let jail = base.join("root");
-    let _ = std::fs::remove_dir_all(&jail);
-    for dir in ["etc", "var/lib", "dev", "bin", "lib", "usr/lib"] {
+    let _ = std::fs::remove_dir_all(&base);
+    for dir in ["etc", "var/lib"] {
         std::fs::create_dir_all(jail.join(dir)).map_err(|e| e.to_string())?;
     }
     std::fs::copy("/etc/passwd", jail.join("etc/passwd")).map_err(|e| e.to_string())?;
@@ -506,59 +506,83 @@ fn chroot_probe() -> Result<String, String> {
     let jail_str = jail.to_string_lossy().into_owned();
     let pid = unsafe { libc::fork() };
     if pid == 0 {
-        let code = (|| -> i32 {
-            // 1) 先 chroot + chdir("/")
-            let c = match std::ffi::CString::new(jail_str.as_str()) {
-                Ok(c) => c,
-                Err(_) => return 20,
-            };
-            if unsafe { chroot(c.as_ptr()) } != 0 {
-                return 21;
+        // 只用 libc：避免 fork 后触碰 std 里可能被其它线程持有的锁
+        let step = |code: libc::c_int| -> ! {
+            unsafe {
+                let path = std::ffi::CString::new("/var/lib/step").unwrap();
+                let fd = libc::open(path.as_ptr(), libc::O_WRONLY | libc::O_CREAT | libc::O_TRUNC, 0o644);
+                if fd >= 0 {
+                    let byte = [code as u8];
+                    libc::write(fd, byte.as_ptr() as *const libc::c_void, 1);
+                    libc::close(fd);
+                }
+                libc::_exit(code);
             }
-            if unsafe { chdir(std::ffi::CString::new("/").unwrap().as_ptr()) } != 0 {
-                return 22;
-            }
+        };
 
-            // 2) chroot 之后再用 jail 内路径 unveil
-            let root = std::ffi::CString::new("/").unwrap();
-            if unsafe { unveil(root.as_ptr(), std::ffi::CString::new("r").unwrap().as_ptr()) } != 0 {
-                return 23;
-            }
-            if unsafe {
-                unveil(
-                    std::ffi::CString::new("/var/lib").unwrap().as_ptr(),
-                    std::ffi::CString::new("rwc").unwrap().as_ptr(),
-                )
-            } != 0
-            {
-                return 24;
-            }
-            if unsafe { unveil(std::ptr::null(), std::ptr::null()) } != 0 {
-                return 25;
-            }
-
-            // 3) jail 内可写路径
-            if std::fs::write("/var/lib/db.sqlite", b"x").is_err() {
-                return 26;
-            }
-            // 4) jail 内的 /etc/passwd 可读
-            if std::fs::read_to_string("/etc/passwd").is_err() {
-                return 27;
-            }
-            // 5) jail 外的路径根本不存在（chroot 隔离）
-            if std::fs::metadata("/../outside").is_ok() {
-                return 28;
-            }
-            1
-        })();
-        unsafe { libc::_exit(code) };
+        let jail_c = match std::ffi::CString::new(jail_str.as_str()) {
+            Ok(c) => c,
+            Err(_) => step(20),
+        };
+        if unsafe { chroot(jail_c.as_ptr()) } != 0 {
+            step(21);
+        }
+        let root = std::ffi::CString::new("/").unwrap();
+        if unsafe { chdir(root.as_ptr()) } != 0 {
+            step(22);
+        }
+        let r = std::ffi::CString::new("r").unwrap();
+        if unsafe { unveil(root.as_ptr(), r.as_ptr()) } != 0 {
+            step(23);
+        }
+        let varlib = std::ffi::CString::new("/var/lib").unwrap();
+        let rwc = std::ffi::CString::new("rwc").unwrap();
+        if unsafe { unveil(varlib.as_ptr(), rwc.as_ptr()) } != 0 {
+            step(24);
+        }
+        if unsafe { unveil(std::ptr::null(), std::ptr::null()) } != 0 {
+            step(25);
+        }
+        // jail 内写文件
+        let db = std::ffi::CString::new("/var/lib/db.sqlite").unwrap();
+        let fd = unsafe { libc::open(db.as_ptr(), libc::O_WRONLY | libc::O_CREAT | libc::O_TRUNC, 0o644) };
+        if fd < 0 {
+            step(26);
+        }
+        unsafe { libc::close(fd) };
+        // jail 内读 /etc/passwd
+        let pw = std::ffi::CString::new("/etc/passwd").unwrap();
+        let fd = unsafe { libc::open(pw.as_ptr(), libc::O_RDONLY) };
+        if fd < 0 {
+            step(27);
+        }
+        unsafe { libc::close(fd) };
+        // jail 外不可见
+        let outside = std::ffi::CString::new("/../../etc/passwd").unwrap();
+        let fd = unsafe { libc::open(outside.as_ptr(), libc::O_RDONLY) };
+        if fd >= 0 {
+            unsafe { libc::close(fd) };
+            step(28);
+        }
+        step(1);
     }
-    let mut status = 0;
+
+    let mut status: libc::c_int = 0;
     unsafe { libc::waitpid(pid, &mut status, 0) };
-    let code = (status >> 8) & 0xff;
+    let step_marker = std::fs::read(jail.join("var/lib/step"))
+        .ok()
+        .and_then(|bytes| bytes.first().copied())
+        .unwrap_or(0);
     let _ = std::fs::remove_dir_all(&base);
-    match code {
-        1 => Ok("chroot + unveil + write + read all OK inside jail".to_string()),
+
+    let signaled = unsafe { libc::WIFSIGNALED(status) };
+    if signaled {
+        let sig = unsafe { libc::WTERMSIG(status) };
+        return Err(format!("child killed by signal {sig} at step {step_marker}"));
+    }
+
+    match step_marker {
+        1 => Ok("chroot + unveil + write + read inside jail, outside not visible".to_string()),
         20 => Err("jail path has NUL".to_string()),
         21 => Err("chroot failed".to_string()),
         22 => Err("chdir(/) after chroot failed".to_string()),
@@ -567,8 +591,8 @@ fn chroot_probe() -> Result<String, String> {
         25 => Err("unveil lock after chroot failed".to_string()),
         26 => Err("write inside jail denied".to_string()),
         27 => Err("cannot read jail /etc/passwd".to_string()),
-        28 => Err("jail escape: /../outside existed".to_string()),
-        other => Err(format!("unexpected exit {other}")),
+        28 => Err("jail escape: /../../etc/passwd opened".to_string()),
+        other => Err(format!("no step marker (exit code {other})")),
     }
 }
 
