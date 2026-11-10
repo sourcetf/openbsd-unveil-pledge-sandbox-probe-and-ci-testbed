@@ -35,3 +35,5 @@ jobs:
             cd probe
             cargo build --release
             ./target/release/probe
+            # chroot 必须在未 pledge 的干净进程里测（照产品的顺序：chroot → unveil → pledge）
+            ./target/release/probe chroot

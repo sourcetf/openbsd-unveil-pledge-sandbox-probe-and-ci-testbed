@@ -1,0 +1,692 @@
+﻿2026-11-10T05:15:20.4305672Z Current runner version: '2.338.2'
+2026-11-10T05:15:20.4330243Z ##[group]Runner Image Provisioner
+2026-11-10T05:15:20.4331243Z Hosted Compute Agent
+2026-11-10T05:15:20.4331911Z Version: 20261028.624
+2026-11-10T05:15:20.4332610Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-10T05:15:20.4333419Z Build Date: 2026-10-28T21:51:42Z
+2026-11-10T05:15:20.4334146Z Worker ID: {d990df17-0499-4726-81cd-9c63bd01a291}
+2026-11-10T05:15:20.4335123Z Region: eastus
+2026-11-10T05:15:20.4335845Z Cloud: Azure
+2026-11-10T05:15:20.4336450Z ##[endgroup]
+2026-11-10T05:15:20.4338078Z ##[group]Operating System
+2026-11-10T05:15:20.4338779Z Ubuntu
+2026-11-10T05:15:20.4339319Z 24.04.5
+2026-11-10T05:15:20.4339939Z LTS
+2026-11-10T05:15:20.4340560Z ##[endgroup]
+2026-11-10T05:15:20.4341175Z ##[group]Runner Image
+2026-11-10T05:15:20.4341814Z Image: ubuntu-24.04
+2026-11-10T05:15:20.4342420Z Version: 20261101.360.1
+2026-11-10T05:15:20.4343747Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-10T05:15:20.4345663Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+2026-11-10T05:15:20.4346742Z ##[endgroup]
+2026-11-10T05:15:20.4348067Z ##[group]GITHUB_TOKEN Permissions
+2026-11-10T05:15:20.4350285Z Contents: read
+2026-11-10T05:15:20.4351080Z Metadata: read
+2026-11-10T05:15:20.4351703Z Packages: read
+2026-11-10T05:15:20.4352292Z ##[endgroup]
+2026-11-10T05:15:20.4355314Z Secret source: Actions
+2026-11-10T05:15:20.4356391Z Cache mode: write
+2026-11-10T05:15:20.4357699Z Prepare workflow directory
+2026-11-10T05:15:20.4692670Z Prepare all required actions
+2026-11-10T05:15:20.4741728Z Getting action download info
+2026-11-10T05:15:20.7350129Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-10T05:15:20.8501512Z Download action repository 'vmactions/openbsd-vm@v1' (SHA:f1ca8bc8ecc5b6ef7218e5b914836e067e1546d3)
+2026-11-10T05:15:22.5247122Z Complete job name: Probe / x86_64-unknown-openbsd
+2026-11-10T05:15:22.6258830Z ##[group]Run actions/checkout@v4
+2026-11-10T05:15:22.6260093Z with:
+2026-11-10T05:15:22.6261109Z   repository: sourcetf/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed
+2026-11-10T05:15:22.6264627Z   token: ***
+2026-11-10T05:15:22.6265691Z   ssh-strict: true
+2026-11-10T05:15:22.6266519Z   ssh-user: git
+2026-11-10T05:15:22.6267353Z   persist-credentials: true
+2026-11-10T05:15:22.6268223Z   clean: true
+2026-11-10T05:15:22.6269059Z   sparse-checkout-cone-mode: true
+2026-11-10T05:15:22.6269958Z   fetch-depth: 1
+2026-11-10T05:15:22.6270812Z   fetch-tags: false
+2026-11-10T05:15:22.6271638Z   show-progress: true
+2026-11-10T05:15:22.6272469Z   lfs: false
+2026-11-10T05:15:22.6273277Z   submodules: false
+2026-11-10T05:15:22.6274123Z   set-safe-directory: true
+2026-11-10T05:15:22.6275140Z   allow-unsafe-pr-checkout: false
+2026-11-10T05:15:22.6276297Z ##[endgroup]
+2026-11-10T05:15:22.9478104Z Syncing repository: sourcetf/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed
+2026-11-10T05:15:22.9481006Z ##[group]Getting Git version info
+2026-11-10T05:15:22.9482127Z Working directory is '/home/runner/work/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed'
+2026-11-10T05:15:22.9483370Z [command]/usr/bin/git version
+2026-11-10T05:15:22.9583720Z git version 2.56.0
+2026-11-10T05:15:22.9617497Z ##[endgroup]
+2026-11-10T05:15:22.9635700Z Temporarily overriding HOME='/home/runner/work/_temp/be651815-3d4b-419d-b716-6e2d1576020c' before making global git config changes
+2026-11-10T05:15:22.9642504Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-10T05:15:22.9645078Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed
+2026-11-10T05:15:22.9703582Z Deleting the contents of '/home/runner/work/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed'
+2026-11-10T05:15:22.9707880Z ##[group]Initializing the repository
+2026-11-10T05:15:22.9715160Z [command]/usr/bin/git init /home/runner/work/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed
+2026-11-10T05:15:22.9840747Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-10T05:15:22.9841798Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-10T05:15:22.9842753Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-10T05:15:22.9843498Z hint: call:
+2026-11-10T05:15:22.9843886Z hint:
+2026-11-10T05:15:22.9844432Z hint: 	git config --global init.defaultBranch <name>
+2026-11-10T05:15:22.9845260Z hint:
+2026-11-10T05:15:22.9845859Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-10T05:15:22.9846820Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-10T05:15:22.9847533Z hint:
+2026-11-10T05:15:22.9847996Z hint: 	git branch -m <name>
+2026-11-10T05:15:22.9848439Z hint:
+2026-11-10T05:15:22.9849052Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-10T05:15:22.9855685Z Initialized empty Git repository in /home/runner/work/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/.git/
+2026-11-10T05:15:22.9868344Z [command]/usr/bin/git remote add origin https://github.com/sourcetf/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed
+2026-11-10T05:15:22.9920399Z ##[endgroup]
+2026-11-10T05:15:22.9921378Z ##[group]Disabling automatic garbage collection
+2026-11-10T05:15:22.9926779Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-10T05:15:22.9963473Z ##[endgroup]
+2026-11-10T05:15:22.9964573Z ##[group]Setting up auth
+2026-11-10T05:15:22.9972449Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-10T05:15:23.0015685Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-10T05:15:23.0444498Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-10T05:15:23.0490131Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-10T05:15:23.0729812Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-10T05:15:23.0773077Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-10T05:15:23.1012162Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-10T05:15:23.1061030Z ##[endgroup]
+2026-11-10T05:15:23.1061575Z ##[group]Fetching the repository
+2026-11-10T05:15:23.1073549Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +90de8863b0311715b99399661be088759219978a:refs/remotes/origin/main
+2026-11-10T05:15:23.3524574Z From https://github.com/sourcetf/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed
+2026-11-10T05:15:23.3526862Z  * [new ref]         90de8863b0311715b99399661be088759219978a -> origin/main
+2026-11-10T05:15:23.3532088Z ##[endgroup]
+2026-11-10T05:15:23.3533014Z ##[group]Determining the checkout info
+2026-11-10T05:15:23.3535834Z ##[endgroup]
+2026-11-10T05:15:23.3544429Z [command]/usr/bin/git sparse-checkout disable
+2026-11-10T05:15:23.3606774Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-10T05:15:23.3649577Z ##[group]Checking out the ref
+2026-11-10T05:15:23.3653268Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-11-10T05:15:23.3752914Z Switched to a new branch 'main'
+2026-11-10T05:15:23.3759027Z branch 'main' set up to track 'origin/main'.
+2026-11-10T05:15:23.3764318Z ##[endgroup]
+2026-11-10T05:15:23.3812320Z [command]/usr/bin/git log -1 --format=%H
+2026-11-10T05:15:23.3845530Z 90de8863b0311715b99399661be088759219978a
+2026-11-10T05:15:23.4160117Z ##[group]Run vmactions/openbsd-vm@v1
+2026-11-10T05:15:23.4160492Z with:
+2026-11-10T05:15:23.4160756Z   release: 7.9
+2026-11-10T05:15:23.4161001Z   usesh: true
+2026-11-10T05:15:23.4161246Z   mem: 2048
+2026-11-10T05:15:23.4161477Z   cpu: 2
+2026-11-10T05:15:23.4162099Z   prepare: set -e
+RELEASE_PKG="https://cdn.openbsd.org/pub/OpenBSD/7.9/packages/amd64"
+pkg_add -Iv -m "$RELEASE_PKG" rust
+rustc --version
+
+2026-11-10T05:15:23.4162892Z   run: set -e
+cd probe
+cargo build --release
+./target/release/probe
+
+2026-11-10T05:15:23.4163296Z   osname: openbsd
+2026-11-10T05:15:23.4163567Z   disable-cache: false
+2026-11-10T05:15:23.4163851Z   cache-after-prepare: false
+2026-11-10T05:15:23.4166364Z   token: ***
+2026-11-10T05:15:23.4166639Z ##[endgroup]
+2026-11-10T05:15:23.7349914Z ##[group]Configuration AnyVM.org
+2026-11-10T05:15:23.7350922Z Using ANYVM_VERSION: 0.7.4
+2026-11-10T05:15:23.7351540Z Using BUILDER_VERSION: 2.1.1
+2026-11-10T05:15:23.7352042Z Target OS: openbsd, Release: 7.9
+2026-11-10T05:15:23.7353145Z Downloading https://github.com/anyvm-org/anyvm/releases/download/v0.7.4/anyvm.py to /home/runner/work/_actions/vmactions/openbsd-vm/v1/anyvm.py
+2026-11-10T05:15:23.8876220Z Redirecting to https://release-assets.githubusercontent.com/github-production-release-asset/1101802944/a0afa94f-c3e5-4335-9ea3-6a9ef06afe7c?sp=r&sv=2018-11-09&sr=b&spr=https&se=2026-11-10T06%3A14%3A18Z&rscd=attachment%3B+filename%3Danyvm.py&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2026-11-10T05%3A13%3A41Z&ske=2026-11-10T06%3A14%3A18Z&sks=b&skv=2018-11-09&sig=vW135DXzS3NqRjakBzOFK5LbIfmTxzAWJN3p9DFJQy4%3D&jwt=***
+2026-11-10T05:15:23.9177688Z ##[endgroup]
+2026-11-10T05:15:23.9178709Z ##[group]Installing dependencies
+2026-11-10T05:15:23.9180350Z Installing dependencies...
+2026-11-10T05:15:23.9865010Z Cache hit for: apt-pkgs-linux-x64-ubuntu24-20261101.360.1-39e60be92fd52804cabcb07c17c01ac3
+2026-11-10T05:15:24.2991980Z Received 23705175 of 23705175 (100.0%), 82.5 MBs/sec
+2026-11-10T05:15:24.2992903Z Cache Size: ~23 MB (23705175 B)
+2026-11-10T05:15:24.3025493Z [command]/usr/bin/tar -xf /home/runner/work/_temp/484d598d-bcc9-417b-bacd-1659cae6e41a/cache.tzst -P -C /home/runner/work/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed --use-compress-program unzstd
+2026-11-10T05:15:24.3550019Z Cache restored successfully
+2026-11-10T05:15:24.3564219Z Restored apt packages from cache: apt-pkgs-linux-x64-ubuntu24-20261101.360.1-39e60be92fd52804cabcb07c17c01ac3
+2026-11-10T05:15:24.3862827Z [command]/usr/bin/sudo apt-get install -y -q -o Acquire::Retries=3 -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-unsafe-io -o Acquire::Languages=none --no-install-recommends qemu-utils qemu-system-x86 ovmf
+2026-11-10T05:15:25.4205143Z Reading package lists...
+2026-11-10T05:15:25.6500940Z Building dependency tree...
+2026-11-10T05:15:25.6512017Z Reading state information...
+2026-11-10T05:15:25.8066875Z The following additional packages will be installed:
+2026-11-10T05:15:25.8068048Z   ipxe-qemu libbrlapi0.8 libcacard0 libdaxctl1 libfdt1 libndctl6 libpcsclite1
+2026-11-10T05:15:25.8075866Z   libpmem1 librdmacm1t64 liburing2 libusbredirparser1t64 qemu-system-common
+2026-11-10T05:15:25.8076847Z   qemu-system-data seabios
+2026-11-10T05:15:25.8085236Z Suggested packages:
+2026-11-10T05:15:25.8085877Z   pcscd samba vde2
+2026-11-10T05:15:25.8086520Z Recommended packages:
+2026-11-10T05:15:25.8087279Z   ipxe-qemu-256k-compat-efi-roms qemu-system-gui qemu-system-modules-spice
+2026-11-10T05:15:25.8088388Z   qemu-system-modules-opengl qemu-block-extra cpu-checker
+2026-11-10T05:15:25.8219625Z The following NEW packages will be installed:
+2026-11-10T05:15:25.8226410Z   ipxe-qemu libbrlapi0.8 libcacard0 libdaxctl1 libfdt1 libndctl6 libpcsclite1
+2026-11-10T05:15:25.8227835Z   libpmem1 librdmacm1t64 liburing2 libusbredirparser1t64 ovmf
+2026-11-10T05:15:25.8228776Z   qemu-system-common qemu-system-data qemu-system-x86 qemu-utils seabios
+2026-11-10T05:15:27.2657757Z 0 upgraded, 17 newly installed, 0 to remove and 1 not upgraded.
+2026-11-10T05:15:27.2658454Z Need to get 0 B/23.8 MB of archives.
+2026-11-10T05:15:27.2659051Z After this operation, 112 MB of additional disk space will be used.
+2026-11-10T05:15:27.2954532Z Selecting previously unselected package ipxe-qemu.
+2026-11-10T05:15:27.3299610Z (Reading database ... 
+2026-11-10T05:15:27.3300171Z (Reading database ... 5%
+2026-11-10T05:15:27.3300567Z (Reading database ... 10%
+2026-11-10T05:15:27.3301174Z (Reading database ... 15%
+2026-11-10T05:15:27.3301617Z (Reading database ... 20%
+2026-11-10T05:15:27.3301902Z (Reading database ... 25%
+2026-11-10T05:15:27.3302186Z (Reading database ... 30%
+2026-11-10T05:15:27.3302466Z (Reading database ... 35%
+2026-11-10T05:15:27.3302773Z (Reading database ... 40%
+2026-11-10T05:15:27.3303061Z (Reading database ... 45%
+2026-11-10T05:15:27.3303336Z (Reading database ... 50%
+2026-11-10T05:15:27.3365513Z (Reading database ... 55%
+2026-11-10T05:15:27.5041287Z (Reading database ... 60%
+2026-11-10T05:15:27.6866634Z (Reading database ... 65%
+2026-11-10T05:15:27.8954309Z (Reading database ... 70%
+2026-11-10T05:15:28.0533278Z (Reading database ... 75%
+2026-11-10T05:15:28.1912123Z (Reading database ... 80%
+2026-11-10T05:15:28.3959906Z (Reading database ... 85%
+2026-11-10T05:15:28.5488707Z (Reading database ... 90%
+2026-11-10T05:15:28.7097062Z (Reading database ... 95%
+2026-11-10T05:15:28.7097643Z (Reading database ... 100%
+2026-11-10T05:15:28.7098285Z (Reading database ... 215960 files and directories currently installed.)
+2026-11-10T05:15:28.7141638Z Preparing to unpack .../00-ipxe-qemu_1.21.1+git-20220113.fbbdc3926-0ubuntu2_all.deb ...
+2026-11-10T05:15:28.7173587Z Unpacking ipxe-qemu (1.21.1+git-20220113.fbbdc3926-0ubuntu2) ...
+2026-11-10T05:15:28.7576587Z Selecting previously unselected package libbrlapi0.8:amd64.
+2026-11-10T05:15:28.7721012Z Preparing to unpack .../01-libbrlapi0.8_6.6-4ubuntu5_amd64.deb ...
+2026-11-10T05:15:28.7744540Z Unpacking libbrlapi0.8:amd64 (6.6-4ubuntu5) ...
+2026-11-10T05:15:28.7984526Z Selecting previously unselected package libpcsclite1:amd64.
+2026-11-10T05:15:28.8128199Z Preparing to unpack .../02-libpcsclite1_2.0.3-1build1_amd64.deb ...
+2026-11-10T05:15:28.8137921Z Unpacking libpcsclite1:amd64 (2.0.3-1build1) ...
+2026-11-10T05:15:28.8378592Z Selecting previously unselected package libcacard0:amd64.
+2026-11-10T05:15:28.8521563Z Preparing to unpack .../03-libcacard0_1%3a2.8.0-3build4_amd64.deb ...
+2026-11-10T05:15:28.8531925Z Unpacking libcacard0:amd64 (1:2.8.0-3build4) ...
+2026-11-10T05:15:28.8775793Z Selecting previously unselected package libdaxctl1:amd64.
+2026-11-10T05:15:28.8923118Z Preparing to unpack .../04-libdaxctl1_77-2ubuntu2_amd64.deb ...
+2026-11-10T05:15:28.8932478Z Unpacking libdaxctl1:amd64 (77-2ubuntu2) ...
+2026-11-10T05:15:28.9188326Z Selecting previously unselected package libndctl6:amd64.
+2026-11-10T05:15:28.9347744Z Preparing to unpack .../05-libndctl6_77-2ubuntu2_amd64.deb ...
+2026-11-10T05:15:28.9358293Z Unpacking libndctl6:amd64 (77-2ubuntu2) ...
+2026-11-10T05:15:28.9592470Z Selecting previously unselected package libpmem1:amd64.
+2026-11-10T05:15:28.9735383Z Preparing to unpack .../06-libpmem1_1.13.1-1.1ubuntu2_amd64.deb ...
+2026-11-10T05:15:28.9744069Z Unpacking libpmem1:amd64 (1.13.1-1.1ubuntu2) ...
+2026-11-10T05:15:29.0008168Z Selecting previously unselected package librdmacm1t64:amd64.
+2026-11-10T05:15:29.0151387Z Preparing to unpack .../07-librdmacm1t64_50.0-2ubuntu0.2_amd64.deb ...
+2026-11-10T05:15:29.0160558Z Unpacking librdmacm1t64:amd64 (50.0-2ubuntu0.2) ...
+2026-11-10T05:15:29.0438861Z Selecting previously unselected package liburing2:amd64.
+2026-11-10T05:15:29.0577170Z Preparing to unpack .../08-liburing2_2.5-1build1_amd64.deb ...
+2026-11-10T05:15:29.0598032Z Unpacking liburing2:amd64 (2.5-1build1) ...
+2026-11-10T05:15:29.0843621Z Selecting previously unselected package libusbredirparser1t64:amd64.
+2026-11-10T05:15:29.0980524Z Preparing to unpack .../09-libusbredirparser1t64_0.13.0-2.1build1_amd64.deb ...
+2026-11-10T05:15:29.0992878Z Unpacking libusbredirparser1t64:amd64 (0.13.0-2.1build1) ...
+2026-11-10T05:15:29.1242702Z Selecting previously unselected package qemu-system-common.
+2026-11-10T05:15:29.1382118Z Preparing to unpack .../10-qemu-system-common_1%3a8.2.2+ds-0ubuntu1.18_amd64.deb ...
+2026-11-10T05:15:29.1392030Z Unpacking qemu-system-common (1:8.2.2+ds-0ubuntu1.18) ...
+2026-11-10T05:15:29.2148812Z Selecting previously unselected package qemu-system-data.
+2026-11-10T05:15:29.2292978Z Preparing to unpack .../11-qemu-system-data_1%3a8.2.2+ds-0ubuntu1.18_all.deb ...
+2026-11-10T05:15:29.2302731Z Unpacking qemu-system-data (1:8.2.2+ds-0ubuntu1.18) ...
+2026-11-10T05:15:29.3061002Z Selecting previously unselected package libfdt1:amd64.
+2026-11-10T05:15:29.3207132Z Preparing to unpack .../12-libfdt1_1.7.0-2build1_amd64.deb ...
+2026-11-10T05:15:29.3214591Z Unpacking libfdt1:amd64 (1.7.0-2build1) ...
+2026-11-10T05:15:29.3443822Z Selecting previously unselected package seabios.
+2026-11-10T05:15:29.3586857Z Preparing to unpack .../13-seabios_1.16.3-2_all.deb ...
+2026-11-10T05:15:29.3595074Z Unpacking seabios (1.16.3-2) ...
+2026-11-10T05:15:29.3883171Z Selecting previously unselected package qemu-system-x86.
+2026-11-10T05:15:29.4027167Z Preparing to unpack .../14-qemu-system-x86_1%3a8.2.2+ds-0ubuntu1.18_amd64.deb ...
+2026-11-10T05:15:29.4104114Z Unpacking qemu-system-x86 (1:8.2.2+ds-0ubuntu1.18) ...
+2026-11-10T05:15:29.6231629Z Selecting previously unselected package qemu-utils.
+2026-11-10T05:15:29.6372135Z Preparing to unpack .../15-qemu-utils_1%3a8.2.2+ds-0ubuntu1.18_amd64.deb ...
+2026-11-10T05:15:29.6380069Z Unpacking qemu-utils (1:8.2.2+ds-0ubuntu1.18) ...
+2026-11-10T05:15:29.7023112Z Selecting previously unselected package ovmf.
+2026-11-10T05:15:29.7167829Z Preparing to unpack .../16-ovmf_2024.02-2ubuntu0.10_all.deb ...
+2026-11-10T05:15:29.7176602Z Unpacking ovmf (2024.02-2ubuntu0.10) ...
+2026-11-10T05:15:29.8081770Z Setting up libfdt1:amd64 (1.7.0-2build1) ...
+2026-11-10T05:15:29.8104085Z Setting up ovmf (2024.02-2ubuntu0.10) ...
+2026-11-10T05:15:29.8125370Z Setting up libpcsclite1:amd64 (2.0.3-1build1) ...
+2026-11-10T05:15:29.8179354Z Setting up libdaxctl1:amd64 (77-2ubuntu2) ...
+2026-11-10T05:15:29.8180315Z Setting up qemu-system-data (1:8.2.2+ds-0ubuntu1.18) ...
+2026-11-10T05:15:29.8196078Z Setting up seabios (1.16.3-2) ...
+2026-11-10T05:15:29.8217970Z Setting up libusbredirparser1t64:amd64 (0.13.0-2.1build1) ...
+2026-11-10T05:15:29.8240758Z Setting up ipxe-qemu (1.21.1+git-20220113.fbbdc3926-0ubuntu2) ...
+2026-11-10T05:15:29.8262440Z Setting up libndctl6:amd64 (77-2ubuntu2) ...
+2026-11-10T05:15:29.8283876Z Setting up librdmacm1t64:amd64 (50.0-2ubuntu0.2) ...
+2026-11-10T05:15:29.8305154Z Setting up libbrlapi0.8:amd64 (6.6-4ubuntu5) ...
+2026-11-10T05:15:29.8330382Z Setting up liburing2:amd64 (2.5-1build1) ...
+2026-11-10T05:15:29.8352341Z Setting up libpmem1:amd64 (1.13.1-1.1ubuntu2) ...
+2026-11-10T05:15:29.8376900Z Setting up libcacard0:amd64 (1:2.8.0-3build4) ...
+2026-11-10T05:15:29.8398600Z Setting up qemu-utils (1:8.2.2+ds-0ubuntu1.18) ...
+2026-11-10T05:15:29.8423031Z Setting up qemu-system-common (1:8.2.2+ds-0ubuntu1.18) ...
+2026-11-10T05:15:29.9596605Z Created symlink /etc/systemd/system/multi-user.target.wants/qemu-kvm.service → /usr/lib/systemd/system/qemu-kvm.service.
+2026-11-10T05:15:29.9597361Z 
+2026-11-10T05:15:30.2789040Z Setting up qemu-system-x86 (1:8.2.2+ds-0ubuntu1.18) ...
+2026-11-10T05:15:30.2895821Z Processing triggers for hicolor-icon-theme (0.17-2) ...
+2026-11-10T05:15:30.8374914Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+2026-11-10T05:15:30.8747068Z Processing triggers for man-db (2.12.0-4build2) ...
+2026-11-10T05:15:30.8772665Z Not building database; man-db/auto-update is not 'true'.
+2026-11-10T05:15:33.9684353Z [command]/usr/bin/sudo chmod 666 /dev/kvm
+2026-11-10T05:15:33.9807513Z ##[endgroup]
+2026-11-10T05:15:33.9809807Z ##[group]Cache
+2026-11-10T05:15:34.0327806Z Cache hit for: openbsd-7.9-2.1.1-amd64-v3
+2026-11-10T05:15:35.0886565Z Received 159383552 of 644394886 (24.7%), 151.1 MBs/sec
+2026-11-10T05:15:36.0945914Z Received 448790528 of 644394886 (69.6%), 212.7 MBs/sec
+2026-11-10T05:15:36.8174206Z Received 644394886 of 644394886 (100.0%), 224.3 MBs/sec
+2026-11-10T05:15:36.8175578Z Cache Size: ~615 MB (644394886 B)
+2026-11-10T05:15:36.8210426Z [command]/usr/bin/tar -xf /home/runner/work/_temp/a47cfb74-48cc-4661-9988-d5e4dddb5a99/cache.tzst -P -C /home/runner/work/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed --use-compress-program unzstd
+2026-11-10T05:15:40.5238519Z Cache restored successfully
+2026-11-10T05:15:41.1995791Z cache.restoreCache() took 7218ms
+2026-11-10T05:15:41.1996420Z Cache restored: openbsd-7.9-2.1.1-amd64-v3
+2026-11-10T05:15:41.1997552Z ##[endgroup]
+2026-11-10T05:15:41.2001294Z ##[group]Permissions
+2026-11-10T05:15:41.2001758Z Setting permissions for /home/runner...
+2026-11-10T05:15:41.2002744Z ##[endgroup]
+2026-11-10T05:15:41.2003470Z ##[group]Starting VM with anyvm.org
+2026-11-10T05:15:41.2022962Z [command]/usr/bin/python3 /home/runner/work/_actions/vmactions/openbsd-vm/v1/anyvm.py --os openbsd --release 7.9 --data-dir /home/runner/work/_actions/vmactions/openbsd-vm/v1/output --cache-dir /home/runner/work/_actions/_vmcache/openbsd-7.9-2.1.1-amd64-v3 --builder 2.1.1 --cpu 2 --mem 2048 -d --ssh-name openbsd --snapshot --vnc off
+2026-11-10T05:15:42.5017413Z [2026-11-10 05:15:42.501] Using release: 7.9
+2026-11-10T05:15:42.6333195Z [2026-11-10 05:15:42.633] Downloading https://github.com/anyvm-org/openbsd-builder/releases/download/v2.1.1/openbsd-7.9.profile.json
+2026-11-10T05:15:43.9775303Z [2026-11-10 05:15:43.977] Started QEMU (PID: 2721)
+2026-11-10T05:16:09.9178330Z [2026-11-10 05:16:09.915] ======================================
+2026-11-10T05:16:09.9205404Z [2026-11-10 05:16:09.915] The VM is still running in background.
+2026-11-10T05:16:09.9206382Z [2026-11-10 05:16:09.915] You can login the VM with:  ssh openbsd-7.9
+2026-11-10T05:16:09.9207036Z [2026-11-10 05:16:09.915] Or just:  ssh 10022
+2026-11-10T05:16:09.9207432Z [2026-11-10 05:16:09.915] Or just:  ssh openbsd
+2026-11-10T05:16:09.9208084Z [2026-11-10 05:16:09.915] ======================================
+2026-11-10T05:16:09.9383763Z ##[endgroup]
+2026-11-10T05:16:09.9384546Z Save Cache (Background)
+2026-11-10T05:16:09.9385729Z Skip cache save (cache was restored or directory missing)
+2026-11-10T05:16:09.9386640Z ##[group]SSH Config
+2026-11-10T05:16:09.9416387Z ##[endgroup]
+2026-11-10T05:16:09.9426161Z ##[group]Syncing source code to VM
+2026-11-10T05:16:09.9426696Z Installing rsync in VM...
+2026-11-10T05:16:09.9427243Z Exec SSH: rm -rf /home/runner/work
+2026-11-10T05:16:10.0758756Z Warning: Permanently added '[127.0.0.1]:10022' (ED25519) to the list of known hosts.
+2026-11-10T05:16:10.1752209Z Exec SSH: mkdir -p /home/runner/work
+2026-11-10T05:16:10.3128158Z Warning: Permanently added '[127.0.0.1]:10022' (ED25519) to the list of known hosts.
+2026-11-10T05:16:10.4146608Z Syncing via Rsync
+2026-11-10T05:16:10.4168752Z [command]/usr/bin/rsync -artopg --rsync-path=sh -c 'PATH=$PATH:/usr/local/bin:/usr/local/sbin:/usr/pkg/bin:/usr/pkg/sbin:/opt/local/bin:/opt/local/sbin exec rsync "$@"' rsync --exclude _actions --exclude _PipelineMapping --exclude cache.tzst -e ssh /home/runner/work/ openbsd:/home/runner/work/
+2026-11-10T05:16:10.5841428Z Warning: Permanently added '[127.0.0.1]:10022' (ED25519) to the list of known hosts.
+2026-11-10T05:16:10.9685301Z ##[endgroup]
+2026-11-10T05:16:10.9686335Z ##[group]Creating workdir symlink
+2026-11-10T05:16:10.9687409Z Exec SSH: [ -L "$HOME/work" ] || ln -s /home/runner/work $HOME/work
+2026-11-10T05:16:11.1546082Z Warning: Permanently added '[127.0.0.1]:10022' (ED25519) to the list of known hosts.
+2026-11-10T05:16:11.3008394Z ##[endgroup]
+2026-11-10T05:16:11.3009286Z ##[group]Run 'prepare' in VM
+2026-11-10T05:16:11.3010091Z Exec SSH: cd "$GITHUB_WORKSPACE"
+2026-11-10T05:16:11.3011080Z set -e
+2026-11-10T05:16:11.3011804Z RELEASE_PKG="https://cdn.openbsd.org/pub/OpenBSD/7.9/packages/amd64"
+2026-11-10T05:16:11.3012958Z pkg_add -Iv -m "$RELEASE_PKG" rust
+2026-11-10T05:16:11.3013666Z rustc --version
+2026-11-10T05:16:11.4749355Z Warning: Permanently added '[127.0.0.1]:10022' (ED25519) to the list of known hosts.
+2026-11-10T05:16:12.9440770Z Update candidates: quirks-7.194 -> quirks-7.194
+2026-11-10T05:16:12.9473608Z 
+2026-11-10T05:16:12.9925060Z quirks-7.194->7.194 (processing)|...                                           
+2026-11-10T05:16:12.9926245Z                                                                                
+2026-11-10T05:16:12.9927433Z quirks-7.194 signed on 2026-10-08T09:58:52Z
+2026-11-10T05:16:12.9941167Z 
+2026-11-10T05:16:13.6602820Z quirks-7.194->7.194 (processing)|No change in quirks-7.194                     
+2026-11-10T05:16:13.6605211Z https://cdn.openbsd.org/pub/OpenBSD/7.9/packages/: empty
+2026-11-10T05:16:14.6177116Z Can't find amd64
+2026-11-10T05:16:14.6339545Z                                                                                
+2026-11-10T05:16:14.6340385Z 
+2026-11-10T05:16:15.4319030Z rust-1.94.1 (processing)|...                                                   
+2026-11-10T05:16:16.8817965Z rust-1.94.1:curl-8.22.0 (processing)|...                                       
+2026-11-10T05:16:18.4162914Z rust-1.94.1:ngtcp2-1.22.1 (processing)|...                                     
+2026-11-10T05:16:18.4519652Z rust-1.94.1:ngtcp2-1.22.1 (extracting)|                                   | 0% 
+2026-11-10T05:16:18.4576969Z rust-1.94.1:ngtcp2-1.22.1 (extracting)|**********************             | 62%
+2026-11-10T05:16:18.4655607Z rust-1.94.1:ngtcp2-1.22.1 (extracting)|*************************          | 72%
+2026-11-10T05:16:18.4818436Z rust-1.94.1:ngtcp2-1.22.1 (extracting)|******************************     | 84%
+2026-11-10T05:16:18.4839510Z rust-1.94.1:ngtcp2-1.22.1 (extracting)|*******************************    | 90%
+2026-11-10T05:16:18.4897979Z rust-1.94.1:ngtcp2-1.22.1 (extracting)|********************************   | 92%
+2026-11-10T05:16:18.4912618Z rust-1.94.1:ngtcp2-1.22.1 (extracting)|********************************** | 98%
+2026-11-10T05:16:18.4951609Z rust-1.94.1:ngtcp2-1.22.1 (extracting)|***********************************| 99%
+2026-11-10T05:16:18.4979956Z rust-1.94.1:ngtcp2-1.22.1 (extracting)|***********************************|100%
+2026-11-10T05:16:18.4985625Z rust-1.94.1:ngtcp2-1.22.1 (installing)|                                   | 0% 
+2026-11-10T05:16:18.4988732Z rust-1.94.1:ngtcp2-1.22.1 (installing)|**                                 | 7% 
+2026-11-10T05:16:18.4993300Z rust-1.94.1:ngtcp2-1.22.1 (installing)|***                                | 8% 
+2026-11-10T05:16:18.4996186Z rust-1.94.1:ngtcp2-1.22.1 (installing)|****************************       | 80%
+2026-11-10T05:16:18.5057284Z rust-1.94.1:ngtcp2-1.22.1 (installing)|********************************   | 92%
+2026-11-10T05:16:18.5062129Z rust-1.94.1:ngtcp2-1.22.1 (installing)|********************************** | 98%
+2026-11-10T05:16:18.5087774Z rust-1.94.1:ngtcp2-1.22.1 (installing)|***********************************|100%
+2026-11-10T05:16:18.5088762Z                                                                                
+2026-11-10T05:16:18.5089311Z 
+2026-11-10T05:16:18.5089542Z rust-1.94.1:ngtcp2-1.22.1: ok
+2026-11-10T05:16:18.5225770Z 
+2026-11-10T05:16:18.6957826Z rust-1.94.1:nghttp2-1.68.1 (processing)|...                                    
+2026-11-10T05:16:18.7272957Z rust-1.94.1:nghttp2-1.68.1 (extracting)|                                  | 0% 
+2026-11-10T05:16:18.7380653Z rust-1.94.1:nghttp2-1.68.1 (extracting)|************************          | 71%
+2026-11-10T05:16:18.7429977Z rust-1.94.1:nghttp2-1.68.1 (extracting)|*****************************     | 84%
+2026-11-10T05:16:18.7469121Z rust-1.94.1:nghttp2-1.68.1 (extracting)|******************************    | 87%
+2026-11-10T05:16:18.7495451Z rust-1.94.1:nghttp2-1.68.1 (extracting)|**********************************|100%
+2026-11-10T05:16:18.7499225Z rust-1.94.1:nghttp2-1.68.1 (installing)|                                  | 0% 
+2026-11-10T05:16:18.7503716Z rust-1.94.1:nghttp2-1.68.1 (installing)|****                              | 13%
+2026-11-10T05:16:18.7506589Z rust-1.94.1:nghttp2-1.68.1 (installing)|*****************************     | 84%
+2026-11-10T05:16:18.7510942Z rust-1.94.1:nghttp2-1.68.1 (installing)|********************************* | 97%
+2026-11-10T05:16:18.7536362Z rust-1.94.1:nghttp2-1.68.1 (installing)|**********************************|100%
+2026-11-10T05:16:18.7537271Z                                                                                
+2026-11-10T05:16:18.7537797Z 
+2026-11-10T05:16:18.7538107Z rust-1.94.1:nghttp2-1.68.1: ok
+2026-11-10T05:16:18.7721323Z 
+2026-11-10T05:16:18.8969164Z rust-1.94.1:nghttp3-1.15.0 (processing)|...                                    
+2026-11-10T05:16:18.9167622Z rust-1.94.1:nghttp3-1.15.0 (extracting)|                                  | 0% 
+2026-11-10T05:16:18.9225690Z rust-1.94.1:nghttp3-1.15.0 (extracting)|**************************        | 77%
+2026-11-10T05:16:18.9250000Z rust-1.94.1:nghttp3-1.15.0 (extracting)|*******************************   | 92%
+2026-11-10T05:16:18.9269684Z rust-1.94.1:nghttp3-1.15.0 (extracting)|*******************************   | 93%
+2026-11-10T05:16:18.9293752Z rust-1.94.1:nghttp3-1.15.0 (extracting)|**********************************|100%
+2026-11-10T05:16:18.9297682Z rust-1.94.1:nghttp3-1.15.0 (installing)|                                  | 0% 
+2026-11-10T05:16:18.9313485Z rust-1.94.1:nghttp3-1.15.0 (installing)|**                                | 7% 
+2026-11-10T05:16:18.9314378Z rust-1.94.1:nghttp3-1.15.0 (installing)|***                               | 7% 
+2026-11-10T05:16:18.9315588Z rust-1.94.1:nghttp3-1.15.0 (installing)|*****************************     | 85%
+2026-11-10T05:16:18.9323921Z rust-1.94.1:nghttp3-1.15.0 (installing)|**********************************|100%
+2026-11-10T05:16:18.9326561Z                                                                                
+2026-11-10T05:16:18.9326990Z 
+2026-11-10T05:16:18.9327152Z rust-1.94.1:nghttp3-1.15.0: ok
+2026-11-10T05:16:18.9442698Z 
+2026-11-10T05:16:20.2881157Z rust-1.94.1:curl-8.22.0 (processing)|...                                       
+2026-11-10T05:16:20.2961968Z rust-1.94.1:curl-8.22.0 (extracting)|                                     | 0% 
+2026-11-10T05:16:20.2986665Z rust-1.94.1:curl-8.22.0 (extracting)|*                                    | 2% 
+2026-11-10T05:16:20.3041953Z rust-1.94.1:curl-8.22.0 (extracting)|*                                    | 3% 
+2026-11-10T05:16:20.3396956Z rust-1.94.1:curl-8.22.0 (extracting)|*                                    | 4% 
+2026-11-10T05:16:20.3707342Z rust-1.94.1:curl-8.22.0 (extracting)|******                               | 17%
+2026-11-10T05:16:20.4022935Z rust-1.94.1:curl-8.22.0 (extracting)|***********                          | 30%
+2026-11-10T05:16:20.4348579Z rust-1.94.1:curl-8.22.0 (extracting)|****************                     | 43%
+2026-11-10T05:16:20.4601228Z rust-1.94.1:curl-8.22.0 (extracting)|*********************                | 56%
+2026-11-10T05:16:20.4826893Z rust-1.94.1:curl-8.22.0 (extracting)|*************************            | 69%
+2026-11-10T05:16:20.5068104Z rust-1.94.1:curl-8.22.0 (extracting)|******************************       | 81%
+2026-11-10T05:16:20.5150297Z rust-1.94.1:curl-8.22.0 (extracting)|*********************************    | 89%
+2026-11-10T05:16:20.5208880Z rust-1.94.1:curl-8.22.0 (extracting)|*********************************    | 90%
+2026-11-10T05:16:20.5236644Z rust-1.94.1:curl-8.22.0 (extracting)|*********************************    | 91%
+2026-11-10T05:16:20.5791636Z rust-1.94.1:curl-8.22.0 (extracting)|**********************************   | 91%
+2026-11-10T05:16:20.6208855Z rust-1.94.1:curl-8.22.0 (extracting)|**********************************   | 92%
+2026-11-10T05:16:20.6541923Z rust-1.94.1:curl-8.22.0 (extracting)|**********************************   | 93%
+2026-11-10T05:16:20.6676854Z rust-1.94.1:curl-8.22.0 (extracting)|***********************************  | 93%
+2026-11-10T05:16:20.7123560Z rust-1.94.1:curl-8.22.0 (extracting)|***********************************  | 94%
+2026-11-10T05:16:20.7626548Z rust-1.94.1:curl-8.22.0 (extracting)|***********************************  | 95%
+2026-11-10T05:16:20.7838037Z rust-1.94.1:curl-8.22.0 (extracting)|***********************************  | 96%
+2026-11-10T05:16:20.8007157Z rust-1.94.1:curl-8.22.0 (extracting)|************************************ | 96%
+2026-11-10T05:16:20.8328238Z rust-1.94.1:curl-8.22.0 (extracting)|************************************ | 97%
+2026-11-10T05:16:20.8565205Z rust-1.94.1:curl-8.22.0 (extracting)|************************************ | 98%
+2026-11-10T05:16:20.8633419Z rust-1.94.1:curl-8.22.0 (extracting)|*************************************| 99%
+2026-11-10T05:16:20.8719028Z rust-1.94.1:curl-8.22.0 (extracting)|*************************************|100%
+2026-11-10T05:16:20.8721748Z rust-1.94.1:curl-8.22.0 (installing)|                                     | 0% 
+2026-11-10T05:16:20.8727804Z rust-1.94.1:curl-8.22.0 (installing)|*                                    | 2% 
+2026-11-10T05:16:20.8733838Z rust-1.94.1:curl-8.22.0 (installing)|*                                    | 3% 
+2026-11-10T05:16:20.8739369Z rust-1.94.1:curl-8.22.0 (installing)|*                                    | 4% 
+2026-11-10T05:16:20.8741661Z rust-1.94.1:curl-8.22.0 (installing)|**                                   | 4% 
+2026-11-10T05:16:20.8745656Z rust-1.94.1:curl-8.22.0 (installing)|******************************       | 81%
+2026-11-10T05:16:20.8750656Z rust-1.94.1:curl-8.22.0 (installing)|*********************************    | 89%
+2026-11-10T05:16:20.8808835Z rust-1.94.1:curl-8.22.0 (installing)|**********************************   | 91%
+2026-11-10T05:16:20.8853143Z rust-1.94.1:curl-8.22.0 (installing)|**********************************   | 92%
+2026-11-10T05:16:20.8890964Z rust-1.94.1:curl-8.22.0 (installing)|**********************************   | 93%
+2026-11-10T05:16:20.8906608Z rust-1.94.1:curl-8.22.0 (installing)|***********************************  | 93%
+2026-11-10T05:16:20.8948526Z rust-1.94.1:curl-8.22.0 (installing)|***********************************  | 94%
+2026-11-10T05:16:20.8992387Z rust-1.94.1:curl-8.22.0 (installing)|***********************************  | 95%
+2026-11-10T05:16:20.9019688Z rust-1.94.1:curl-8.22.0 (installing)|***********************************  | 96%
+2026-11-10T05:16:20.9041635Z rust-1.94.1:curl-8.22.0 (installing)|************************************ | 96%
+2026-11-10T05:16:20.9072966Z rust-1.94.1:curl-8.22.0 (installing)|************************************ | 97%
+2026-11-10T05:16:20.9099852Z rust-1.94.1:curl-8.22.0 (installing)|************************************ | 98%
+2026-11-10T05:16:20.9103340Z rust-1.94.1:curl-8.22.0 (installing)|************************************ | 99%
+2026-11-10T05:16:20.9107952Z rust-1.94.1:curl-8.22.0 (installing)|*************************************| 99%
+2026-11-10T05:16:20.9134450Z rust-1.94.1:curl-8.22.0 (installing)|*************************************|100%
+2026-11-10T05:16:20.9135594Z                                                                                
+2026-11-10T05:16:20.9136056Z 
+2026-11-10T05:16:20.9136371Z rust-1.94.1:curl-8.22.0: ok
+2026-11-10T05:16:20.9333980Z 
+2026-11-10T05:16:21.5189052Z rust-1.94.1 (processing)|...                                                   
+2026-11-10T05:16:21.5751066Z rust-1.94.1 (extracting)|                                                 | 0% 
+2026-11-10T05:16:21.6016245Z rust-1.94.1 (extracting)|                                                 | 1% 
+2026-11-10T05:16:21.6272749Z rust-1.94.1 (extracting)|*                                                | 1% 
+2026-11-10T05:16:21.6899453Z rust-1.94.1 (extracting)|*                                                | 2% 
+2026-11-10T05:16:21.7271657Z rust-1.94.1 (extracting)|*                                                | 3% 
+2026-11-10T05:16:21.7609056Z rust-1.94.1 (extracting)|**                                               | 3% 
+2026-11-10T05:16:21.8261223Z rust-1.94.1 (extracting)|**                                               | 4% 
+2026-11-10T05:16:21.8833252Z rust-1.94.1 (extracting)|**                                               | 5% 
+2026-11-10T05:16:21.9593060Z rust-1.94.1 (extracting)|***                                              | 6% 
+2026-11-10T05:16:21.9822953Z rust-1.94.1 (extracting)|***                                              | 7% 
+2026-11-10T05:16:22.0123326Z rust-1.94.1 (extracting)|****                                             | 7% 
+2026-11-10T05:16:22.0530657Z rust-1.94.1 (extracting)|****                                             | 8% 
+2026-11-10T05:16:22.0730046Z rust-1.94.1 (extracting)|****                                             | 9% 
+2026-11-10T05:16:22.0902622Z rust-1.94.1 (extracting)|*****                                            | 9% 
+2026-11-10T05:16:22.1261625Z rust-1.94.1 (extracting)|*****                                            | 10%
+2026-11-10T05:16:22.1632240Z rust-1.94.1 (extracting)|*****                                            | 11%
+2026-11-10T05:16:22.2262918Z rust-1.94.1 (extracting)|******                                           | 12%
+2026-11-10T05:16:22.2467470Z rust-1.94.1 (extracting)|******                                           | 13%
+2026-11-10T05:16:22.2717441Z rust-1.94.1 (extracting)|*******                                          | 13%
+2026-11-10T05:16:22.3347831Z rust-1.94.1 (extracting)|*******                                          | 14%
+2026-11-10T05:16:22.3866746Z rust-1.94.1 (extracting)|*******                                          | 15%
+2026-11-10T05:16:22.4467800Z rust-1.94.1 (extracting)|********                                         | 16%
+2026-11-10T05:16:22.5002517Z rust-1.94.1 (extracting)|********                                         | 17%
+2026-11-10T05:16:22.5311615Z rust-1.94.1 (extracting)|*********                                        | 17%
+2026-11-10T05:16:22.5946379Z rust-1.94.1 (extracting)|*********                                        | 18%
+2026-11-10T05:16:22.6727267Z rust-1.94.1 (extracting)|*********                                        | 19%
+2026-11-10T05:16:22.7375081Z rust-1.94.1 (extracting)|**********                                       | 20%
+2026-11-10T05:16:22.8065411Z rust-1.94.1 (extracting)|**********                                       | 21%
+2026-11-10T05:16:22.8708153Z rust-1.94.1 (extracting)|***********                                      | 22%
+2026-11-10T05:16:22.9299246Z rust-1.94.1 (extracting)|***********                                      | 23%
+2026-11-10T05:16:22.9622384Z rust-1.94.1 (extracting)|************                                     | 23%
+2026-11-10T05:16:23.0225988Z rust-1.94.1 (extracting)|************                                     | 24%
+2026-11-10T05:16:23.0869501Z rust-1.94.1 (extracting)|************                                     | 25%
+2026-11-10T05:16:23.1582956Z rust-1.94.1 (extracting)|*************                                    | 26%
+2026-11-10T05:16:23.2251949Z rust-1.94.1 (extracting)|*************                                    | 27%
+2026-11-10T05:16:23.2933210Z rust-1.94.1 (extracting)|**************                                   | 28%
+2026-11-10T05:16:23.3933100Z rust-1.94.1 (extracting)|**************                                   | 29%
+2026-11-10T05:16:23.4617911Z rust-1.94.1 (extracting)|***************                                  | 30%
+2026-11-10T05:16:23.5251631Z rust-1.94.1 (extracting)|***************                                  | 31%
+2026-11-10T05:16:23.5825519Z rust-1.94.1 (extracting)|****************                                 | 32%
+2026-11-10T05:16:23.6426044Z rust-1.94.1 (extracting)|****************                                 | 33%
+2026-11-10T05:16:23.6730834Z rust-1.94.1 (extracting)|****************                                 | 34%
+2026-11-10T05:16:23.7010976Z rust-1.94.1 (extracting)|*****************                                | 34%
+2026-11-10T05:16:23.7894119Z rust-1.94.1 (extracting)|*****************                                | 35%
+2026-11-10T05:16:23.8473361Z rust-1.94.1 (extracting)|******************                               | 36%
+2026-11-10T05:16:23.9100564Z rust-1.94.1 (extracting)|******************                               | 37%
+2026-11-10T05:16:23.9368881Z rust-1.94.1 (extracting)|******************                               | 38%
+2026-11-10T05:16:23.9617220Z rust-1.94.1 (extracting)|*******************                              | 38%
+2026-11-10T05:16:24.0233690Z rust-1.94.1 (extracting)|*******************                              | 39%
+2026-11-10T05:16:24.0538666Z rust-1.94.1 (extracting)|*******************                              | 40%
+2026-11-10T05:16:24.0836759Z rust-1.94.1 (extracting)|********************                             | 40%
+2026-11-10T05:16:24.1716024Z rust-1.94.1 (extracting)|********************                             | 41%
+2026-11-10T05:16:24.2330570Z rust-1.94.1 (extracting)|*********************                            | 42%
+2026-11-10T05:16:24.2930580Z rust-1.94.1 (extracting)|*********************                            | 43%
+2026-11-10T05:16:24.3250685Z rust-1.94.1 (extracting)|*********************                            | 44%
+2026-11-10T05:16:24.3547327Z rust-1.94.1 (extracting)|**********************                           | 44%
+2026-11-10T05:16:24.3947991Z rust-1.94.1 (extracting)|**********************                           | 45%
+2026-11-10T05:16:24.4195879Z rust-1.94.1 (extracting)|**********************                           | 46%
+2026-11-10T05:16:24.4760431Z rust-1.94.1 (extracting)|***********************                          | 46%
+2026-11-10T05:16:24.5301360Z rust-1.94.1 (extracting)|***********************                          | 47%
+2026-11-10T05:16:24.5473996Z rust-1.94.1 (extracting)|***********************                          | 48%
+2026-11-10T05:16:24.5658610Z rust-1.94.1 (extracting)|************************                         | 48%
+2026-11-10T05:16:24.6014933Z rust-1.94.1 (extracting)|************************                         | 49%
+2026-11-10T05:16:24.6197089Z rust-1.94.1 (extracting)|************************                         | 50%
+2026-11-10T05:16:24.6367751Z rust-1.94.1 (extracting)|*************************                        | 50%
+2026-11-10T05:16:24.6729605Z rust-1.94.1 (extracting)|*************************                        | 51%
+2026-11-10T05:16:24.7087615Z rust-1.94.1 (extracting)|*************************                        | 52%
+2026-11-10T05:16:24.7288242Z rust-1.94.1 (extracting)|**************************                       | 52%
+2026-11-10T05:16:24.7677353Z rust-1.94.1 (extracting)|**************************                       | 53%
+2026-11-10T05:16:24.7894363Z rust-1.94.1 (extracting)|**************************                       | 54%
+2026-11-10T05:16:24.8091213Z rust-1.94.1 (extracting)|***************************                      | 54%
+2026-11-10T05:16:24.8458274Z rust-1.94.1 (extracting)|***************************                      | 55%
+2026-11-10T05:16:24.8642861Z rust-1.94.1 (extracting)|***************************                      | 56%
+2026-11-10T05:16:24.8862745Z rust-1.94.1 (extracting)|****************************                     | 56%
+2026-11-10T05:16:24.9199546Z rust-1.94.1 (extracting)|****************************                     | 57%
+2026-11-10T05:16:24.9557742Z rust-1.94.1 (extracting)|****************************                     | 58%
+2026-11-10T05:16:24.9711034Z rust-1.94.1 (extracting)|*****************************                    | 58%
+2026-11-10T05:16:25.0075638Z rust-1.94.1 (extracting)|*****************************                    | 59%
+2026-11-10T05:16:25.0262285Z rust-1.94.1 (extracting)|*****************************                    | 60%
+2026-11-10T05:16:25.0428570Z rust-1.94.1 (extracting)|******************************                   | 60%
+2026-11-10T05:16:25.0781364Z rust-1.94.1 (extracting)|******************************                   | 61%
+2026-11-10T05:16:25.1432955Z rust-1.94.1 (extracting)|******************************                   | 62%
+2026-11-10T05:16:25.2363954Z rust-1.94.1 (extracting)|*******************************                  | 63%
+2026-11-10T05:16:25.2648210Z rust-1.94.1 (extracting)|*******************************                  | 64%
+2026-11-10T05:16:25.2955094Z rust-1.94.1 (extracting)|********************************                 | 64%
+2026-11-10T05:16:25.3609693Z rust-1.94.1 (extracting)|********************************                 | 65%
+2026-11-10T05:16:25.4282457Z rust-1.94.1 (extracting)|********************************                 | 66%
+2026-11-10T05:16:25.4972676Z rust-1.94.1 (extracting)|*********************************                | 67%
+2026-11-10T05:16:25.5495056Z rust-1.94.1 (extracting)|*********************************                | 68%
+2026-11-10T05:16:25.5706005Z rust-1.94.1 (extracting)|**********************************               | 68%
+2026-11-10T05:16:25.6071384Z rust-1.94.1 (extracting)|**********************************               | 69%
+2026-11-10T05:16:25.6302892Z rust-1.94.1 (extracting)|**********************************               | 70%
+2026-11-10T05:16:25.6632086Z rust-1.94.1 (extracting)|***********************************              | 70%
+2026-11-10T05:16:25.7309411Z rust-1.94.1 (extracting)|***********************************              | 71%
+2026-11-10T05:16:25.8033342Z rust-1.94.1 (extracting)|***********************************              | 72%
+2026-11-10T05:16:25.8632967Z rust-1.94.1 (extracting)|************************************             | 73%
+2026-11-10T05:16:25.9517171Z rust-1.94.1 (extracting)|************************************             | 74%
+2026-11-10T05:16:26.0179585Z rust-1.94.1 (extracting)|*************************************            | 75%
+2026-11-10T05:16:26.1126445Z rust-1.94.1 (extracting)|*************************************            | 76%
+2026-11-10T05:16:26.1711844Z rust-1.94.1 (extracting)|**************************************           | 77%
+2026-11-10T05:16:26.2240414Z rust-1.94.1 (extracting)|**************************************           | 78%
+2026-11-10T05:16:26.2867295Z rust-1.94.1 (extracting)|***************************************          | 79%
+2026-11-10T05:16:26.3670395Z rust-1.94.1 (extracting)|***************************************          | 80%
+2026-11-10T05:16:26.4222393Z rust-1.94.1 (extracting)|****************************************         | 81%
+2026-11-10T05:16:26.4786426Z rust-1.94.1 (extracting)|****************************************         | 82%
+2026-11-10T05:16:26.5230085Z rust-1.94.1 (extracting)|*****************************************        | 83%
+2026-11-10T05:16:26.5671580Z rust-1.94.1 (extracting)|*****************************************        | 84%
+2026-11-10T05:16:26.5917841Z rust-1.94.1 (extracting)|*****************************************        | 85%
+2026-11-10T05:16:26.6445785Z rust-1.94.1 (extracting)|******************************************       | 85%
+2026-11-10T05:16:26.6993164Z rust-1.94.1 (extracting)|******************************************       | 86%
+2026-11-10T05:16:26.7713871Z rust-1.94.1 (extracting)|*******************************************      | 87%
+2026-11-10T05:16:26.8379160Z rust-1.94.1 (extracting)|*******************************************      | 88%
+2026-11-10T05:16:26.8924590Z rust-1.94.1 (extracting)|*******************************************      | 89%
+2026-11-10T05:16:26.9020771Z rust-1.94.1 (extracting)|********************************************     | 89%
+2026-11-10T05:16:26.9574031Z rust-1.94.1 (extracting)|********************************************     | 90%
+2026-11-10T05:16:26.9836731Z rust-1.94.1 (extracting)|********************************************     | 91%
+2026-11-10T05:16:27.0445788Z rust-1.94.1 (extracting)|*********************************************    | 91%
+2026-11-10T05:16:27.1064202Z rust-1.94.1 (extracting)|*********************************************    | 92%
+2026-11-10T05:16:27.1317739Z rust-1.94.1 (extracting)|*********************************************    | 93%
+2026-11-10T05:16:27.1731632Z rust-1.94.1 (extracting)|**********************************************   | 93%
+2026-11-10T05:16:27.2560422Z rust-1.94.1 (extracting)|**********************************************   | 94%
+2026-11-10T05:16:27.3042797Z rust-1.94.1 (extracting)|***********************************************  | 95%
+2026-11-10T05:16:27.3781951Z rust-1.94.1 (extracting)|***********************************************  | 96%
+2026-11-10T05:16:27.4137998Z rust-1.94.1 (extracting)|***********************************************  | 97%
+2026-11-10T05:16:27.4446954Z rust-1.94.1 (extracting)|************************************************ | 97%
+2026-11-10T05:16:27.5259381Z rust-1.94.1 (extracting)|************************************************ | 98%
+2026-11-10T05:16:27.5644570Z rust-1.94.1 (extracting)|************************************************ | 99%
+2026-11-10T05:16:27.5749251Z rust-1.94.1 (extracting)|*************************************************| 99%
+2026-11-10T05:16:27.6444355Z rust-1.94.1 (extracting)|*************************************************|100%
+2026-11-10T05:16:27.6446689Z rust-1.94.1 (installing)|                                                 | 0% 
+2026-11-10T05:16:27.6450374Z rust-1.94.1 (installing)|****                                             | 9% 
+2026-11-10T05:16:27.6455014Z rust-1.94.1 (installing)|******                                           | 12%
+2026-11-10T05:16:27.6464249Z rust-1.94.1 (installing)|************************************             | 74%
+2026-11-10T05:16:27.6469052Z rust-1.94.1 (installing)|*************************************            | 76%
+2026-11-10T05:16:27.6470283Z rust-1.94.1 (installing)|*************************************            | 77%
+2026-11-10T05:16:27.6472900Z rust-1.94.1 (installing)|**************************************           | 77%
+2026-11-10T05:16:27.6477353Z rust-1.94.1 (installing)|********************************************     | 91%
+2026-11-10T05:16:27.6478828Z rust-1.94.1 (installing)|*********************************************    | 91%
+2026-11-10T05:16:27.6484517Z rust-1.94.1 (installing)|*********************************************    | 92%
+2026-11-10T05:16:27.6486699Z rust-1.94.1 (installing)|*********************************************    | 93%
+2026-11-10T05:16:27.6492270Z rust-1.94.1 (installing)|**********************************************   | 93%
+2026-11-10T05:16:27.6498952Z rust-1.94.1 (installing)|***********************************************  | 95%
+2026-11-10T05:16:27.6509337Z rust-1.94.1 (installing)|***********************************************  | 96%
+2026-11-10T05:16:27.6511489Z rust-1.94.1 (installing)|***********************************************  | 97%
+2026-11-10T05:16:27.6512345Z rust-1.94.1 (installing)|************************************************ | 98%
+2026-11-10T05:16:27.6514430Z rust-1.94.1 (installing)|************************************************ | 99%
+2026-11-10T05:16:27.6518712Z rust-1.94.1 (installing)|*************************************************| 99%
+2026-11-10T05:16:27.6571785Z rust-1.94.1 (installing)|*************************************************|100%
+2026-11-10T05:16:27.6572572Z                                                                                
+2026-11-10T05:16:27.6573026Z 
+2026-11-10T05:16:27.6573178Z rust-1.94.1: ok
+2026-11-10T05:16:28.2126063Z rustc 1.94.1 (e408947bf 2026-03-25) (built from a source tarball)
+2026-11-10T05:16:28.2605955Z ##[endgroup]
+2026-11-10T05:16:28.2606613Z ##[group]Run 'run' in VM
+2026-11-10T05:16:28.2607030Z Exec SSH: cd "$GITHUB_WORKSPACE"
+2026-11-10T05:16:28.2607469Z set -e
+2026-11-10T05:16:28.2607797Z cd probe
+2026-11-10T05:16:28.2608139Z cargo build --release
+2026-11-10T05:16:28.2608554Z ./target/release/probe
+2026-11-10T05:16:28.3572295Z Warning: Permanently added '[127.0.0.1]:10022' (ED25519) to the list of known hosts.
+2026-11-10T05:16:28.7298959Z     Updating crates.io index
+2026-11-10T05:16:28.8102561Z  Downloading crates ...
+2026-11-10T05:16:28.9882417Z   Downloaded libc v0.2.191
+2026-11-10T05:16:29.7537269Z    Compiling libc v0.2.191
+2026-11-10T05:16:32.9565794Z    Compiling obsd-sandbox-probe v0.1.0 (/home/runner/work/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/probe)
+2026-11-10T05:16:33.3735599Z warning: unnecessary `unsafe` block
+2026-11-10T05:16:33.3736226Z    --> src/main.rs:578:20
+2026-11-10T05:16:33.3736644Z     |
+2026-11-10T05:16:33.3737139Z 578 |     let signaled = unsafe { libc::WIFSIGNALED(status) };
+2026-11-10T05:16:33.3737872Z     |                    ^^^^^^ unnecessary `unsafe` block
+2026-11-10T05:16:33.3738380Z     |
+2026-11-10T05:16:33.3738897Z     = note: `#[warn(unused_unsafe)]` (part of `#[warn(unused)]`) on by default
+2026-11-10T05:16:33.3739402Z 
+2026-11-10T05:16:33.3739587Z warning: unnecessary `unsafe` block
+2026-11-10T05:16:33.3740049Z    --> src/main.rs:580:19
+2026-11-10T05:16:33.3740429Z     |
+2026-11-10T05:16:33.3740849Z 580 |         let sig = unsafe { libc::WTERMSIG(status) };
+2026-11-10T05:16:33.3741498Z     |                   ^^^^^^ unnecessary `unsafe` block
+2026-11-10T05:16:33.3741874Z 
+2026-11-10T05:16:33.3942967Z warning: function `self_check` is never used
+2026-11-10T05:16:33.3943754Z    --> src/sandbox.rs:301:8
+2026-11-10T05:16:33.3944269Z     |
+2026-11-10T05:16:33.3944735Z 301 | pub fn self_check() -> Result<(), String> {
+2026-11-10T05:16:33.3945166Z     |        ^^^^^^^^^^
+2026-11-10T05:16:33.3945622Z     |
+2026-11-10T05:16:33.3945918Z     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+2026-11-10T05:16:33.3946430Z 
+2026-11-10T05:16:35.8555829Z warning: `obsd-sandbox-probe` (bin "probe") generated 3 warnings
+2026-11-10T05:16:35.8556516Z     Finished `release` profile [optimized] target(s) in 7.37s
+2026-11-10T05:16:35.8775525Z sandbox: unveil(3 r + 2 rwc + 2 rx), pledge(stdio rpath wpath cpath dpath fattr flock inet unix dns getpw id proc exec tty ps vminfo)
+2026-11-10T05:16:35.8776907Z   rwc: /tmp/probe-data /tmp
+2026-11-10T05:16:35.8777656Z   rx: /bin/echo /bin/sh
+2026-11-10T05:16:35.8778599Z   -- per-promise check --
+2026-11-10T05:16:35.8868120Z   ok   promise stdio
+2026-11-10T05:16:35.8868682Z   ok   promise rpath
+2026-11-10T05:16:35.8869034Z   ok   promise wpath
+2026-11-10T05:16:35.8869326Z   ok   promise cpath
+2026-11-10T05:16:35.8869601Z   ok   promise dpath
+2026-11-10T05:16:35.8869879Z   ok   promise fattr
+2026-11-10T05:16:35.8870161Z   ok   promise flock
+2026-11-10T05:16:35.8870438Z   ok   promise inet
+2026-11-10T05:16:35.8870712Z   ok   promise unix
+2026-11-10T05:16:35.8870976Z   ok   promise dns
+2026-11-10T05:16:35.8871241Z   ok   promise getpw
+2026-11-10T05:16:35.8871514Z   ok   promise id
+2026-11-10T05:16:35.8871780Z   ok   promise proc
+2026-11-10T05:16:35.8872110Z   ok   promise exec
+2026-11-10T05:16:35.8872496Z   ok   promise tty
+2026-11-10T05:16:35.8873018Z   ok   promise ps
+2026-11-10T05:16:35.8873407Z   ok   promise vminfo
+2026-11-10T05:16:35.8890024Z   ok   relative path registration: resolved to /tmp/probe-relative/data
+2026-11-10T05:16:35.8899726Z OpenBSD sandbox: note: /tmp/probe-missing/a/b does not exist yet;                                      granting its ancestor /tmp read/write instead.
+2026-11-10T05:16:35.8901392Z OpenBSD sandbox: note: /tmp/probe-missing/a does not exist yet;                                      granting its ancestor /tmp read/write instead.
+2026-11-10T05:16:35.8924394Z   ok   multi-level missing dir: created missing chain and wrote 1 byte
+2026-11-10T05:16:35.8951879Z        default: /etc/passwd=true /etc/ssh/sshd_config=true
+2026-11-10T05:16:35.8952930Z        strict : /etc/passwd=true /etc/ssh/sshd_config=false
+2026-11-10T05:16:35.8953912Z   ok   strict mode read policy: strict denies unlisted reads, default does not
+2026-11-10T05:16:35.8957673Z       unveil(/tmp/probe-missing-parent-xyz/child) -> No such file or directory (os error 2)
+2026-11-10T05:16:35.8960257Z   note unveil missing path /tmp/probe-missing-parent-xyz/child: rejected with ENOENT
+2026-11-10T05:16:35.8966809Z   note unveil missing path /tmp/definitely-not-there-xyz: accepted (ENOENT 不是问题)
+2026-11-10T05:16:35.8968807Z   ok   unveil: locked
+2026-11-10T05:16:35.8970057Z   ok   pledge: stdio rpath wpath cpath dpath fattr flock inet unix dns getpw id proc exec tty ps vminfo
+2026-11-10T05:16:35.8975295Z   ok   write file in data dir: wrote
+2026-11-10T05:16:35.8976021Z   ok   read file in data dir: 5 bytes
+2026-11-10T05:16:35.8981391Z   ok   rename in data dir: renamed
+2026-11-10T05:16:35.8983616Z   ok   unlink in data dir: removed
+2026-11-10T05:16:35.8988134Z   ok   append to log file: appended
+2026-11-10T05:16:35.8988853Z   ok   raw icmp socket: raw ICMP socket created and closed
+2026-11-10T05:16:35.8994146Z   ok   outbound tcp connect: connected to 127.0.0.1:9339
+2026-11-10T05:16:35.9028119Z   ok   udp send/recv to resolver: 61 bytes from 192.168.122.3:53
+2026-11-10T05:16:35.9061541Z   ok   getaddrinfo(name): resolved to 4 address(es)
+2026-11-10T05:16:35.9062920Z   ok   getrandom from /dev/urandom: 32 bytes
+2026-11-10T05:16:35.9079568Z   ok   flock + fsync on store file: locked, synced, unlocked
+2026-11-10T05:16:35.9080397Z   ok   read /etc/resolv.conf: 58 bytes
+2026-11-10T05:16:35.9083026Z   ok   read /etc/ssl: 5 entries
+2026-11-10T05:16:35.9083537Z   ok   read /etc/services: 12085 bytes
+2026-11-10T05:16:35.9084052Z   ok   tcp bind: 127.0.0.1:30267
+2026-11-10T05:16:35.9087737Z   ok   unix socket bind: bound
+2026-11-10T05:16:35.9113847Z   ok   fork/exec /bin/echo: sandbox-ok
+2026-11-10T05:16:35.9115962Z   ok   getpwuid(getuid): uid 0 -> root
+2026-11-10T05:16:35.9121852Z   ok   mkstemp in temp dir: /tmp/probe-CM86Tn
+2026-11-10T05:16:35.9724556Z   FAIL chroot semantics: child killed by signal 6 at step 0
+2026-11-10T05:16:35.9725921Z   ok   unveil enforcement: /var/probe-should-fail -> Permission denied (os error 13)
+2026-11-10T05:16:35.9726695Z 
+2026-11-10T05:16:35.9727028Z 1 CHECK(S) FAILED
+2026-11-10T05:16:35.9727516Z   - chroot semantics: child killed by signal 6 at step 0
+2026-11-10T05:16:35.9757293Z ##[endgroup]
+2026-11-10T05:16:35.9787825Z ##[error]ssh exited with code 1
+2026-11-10T05:16:36.0259475Z Post job cleanup.
+2026-11-10T05:16:36.1221824Z [command]/usr/bin/git version
+2026-11-10T05:16:36.1261241Z git version 2.56.0
+2026-11-10T05:16:36.1327440Z Temporarily overriding HOME='/home/runner/work/_temp/b22eaa8e-9f67-4c20-b7aa-4872efe9df5d' before making global git config changes
+2026-11-10T05:16:36.1328278Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-10T05:16:36.1329338Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed/openbsd-unveil-pledge-sandbox-probe-and-ci-testbed
+2026-11-10T05:16:36.1370548Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-10T05:16:36.1419015Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-10T05:16:36.1709904Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-10T05:16:36.1745655Z http.https://github.com/.extraheader
+2026-11-10T05:16:36.1770142Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-10T05:16:36.1814261Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-10T05:16:36.2099920Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-10T05:16:36.2149520Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-10T05:16:36.2610881Z Cleaning up orphan processes
+2026-11-10T05:16:36.3065674Z Terminate orphan process: pid (2721) (qemu-system-x86_64)
+2026-11-10T05:16:36.3139410Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
