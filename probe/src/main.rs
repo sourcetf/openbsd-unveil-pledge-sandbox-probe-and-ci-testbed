@@ -247,6 +247,10 @@ fn main() {
 
     // 多级目录都不存在时（首次安装）：目录要能建出来，而且要能写进去
     // 严格模式 vs 默认模式的读权限对比（各自 fork 一个子进程，unveil 不可逆）
+    // chroot 的语义（在子进程里，因为 chroot 不可逆）：必须在 unveil 之前，
+    // 且 jail 内要有 /dev/urandom 与 /etc/passwd
+    step("chroot semantics", chroot_probe(), &mut failures);
+
     // 反例：未登记的目录必须写不进去（否则 unveil 没生效）
     let outside = "/var/probe-should-fail";
     match std::fs::write(outside, b"x") {
@@ -483,6 +487,94 @@ fn flock_and_fsync() -> Result<String, String> {
     file.sync_all().map_err(|e| e.to_string())?;
     unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_UN) };
     Ok("locked, synced, unlocked".to_string())
+}
+
+/// 在子进程里验证：chroot 之后 unveil 用 jail 内路径是否生效、写是否被限制、
+/// /dev/urandom 与 /etc/passwd 是否能读到。
+fn chroot_probe() -> Result<String, String> {
+    let base = std::env::temp_dir().join("probe-jail");
+    let jail = base.join("root");
+    let _ = std::fs::remove_dir_all(&jail);
+    for dir in ["etc", "var/lib", "dev", "bin", "lib", "usr/lib"] {
+        std::fs::create_dir_all(jail.join(dir)).map_err(|e| e.to_string())?;
+    }
+    std::fs::copy("/etc/passwd", jail.join("etc/passwd")).map_err(|e| e.to_string())?;
+    std::fs::write(jail.join("etc/resolv.conf"), b"nameserver 127.0.0.1
+")
+        .map_err(|e| e.to_string())?;
+
+    let jail_str = jail.to_string_lossy().into_owned();
+    let pid = unsafe { libc::fork() };
+    if pid == 0 {
+        let code = (|| -> i32 {
+            // 1) 先 chroot + chdir("/")
+            let c = match std::ffi::CString::new(jail_str.as_str()) {
+                Ok(c) => c,
+                Err(_) => return 20,
+            };
+            if unsafe { chroot(c.as_ptr()) } != 0 {
+                return 21;
+            }
+            if unsafe { chdir(std::ffi::CString::new("/").unwrap().as_ptr()) } != 0 {
+                return 22;
+            }
+
+            // 2) chroot 之后再用 jail 内路径 unveil
+            let root = std::ffi::CString::new("/").unwrap();
+            if unsafe { unveil(root.as_ptr(), std::ffi::CString::new("r").unwrap().as_ptr()) } != 0 {
+                return 23;
+            }
+            if unsafe {
+                unveil(
+                    std::ffi::CString::new("/var/lib").unwrap().as_ptr(),
+                    std::ffi::CString::new("rwc").unwrap().as_ptr(),
+                )
+            } != 0
+            {
+                return 24;
+            }
+            if unsafe { unveil(std::ptr::null(), std::ptr::null()) } != 0 {
+                return 25;
+            }
+
+            // 3) jail 内可写路径
+            if std::fs::write("/var/lib/db.sqlite", b"x").is_err() {
+                return 26;
+            }
+            // 4) jail 内的 /etc/passwd 可读
+            if std::fs::read_to_string("/etc/passwd").is_err() {
+                return 27;
+            }
+            // 5) jail 外的路径根本不存在（chroot 隔离）
+            if std::fs::metadata("/../outside").is_ok() {
+                return 28;
+            }
+            1
+        })();
+        unsafe { libc::_exit(code) };
+    }
+    let mut status = 0;
+    unsafe { libc::waitpid(pid, &mut status, 0) };
+    let code = (status >> 8) & 0xff;
+    let _ = std::fs::remove_dir_all(&base);
+    match code {
+        1 => Ok("chroot + unveil + write + read all OK inside jail".to_string()),
+        20 => Err("jail path has NUL".to_string()),
+        21 => Err("chroot failed".to_string()),
+        22 => Err("chdir(/) after chroot failed".to_string()),
+        23 => Err("unveil(/) after chroot failed".to_string()),
+        24 => Err("unveil(/var/lib) after chroot failed".to_string()),
+        25 => Err("unveil lock after chroot failed".to_string()),
+        26 => Err("write inside jail denied".to_string()),
+        27 => Err("cannot read jail /etc/passwd".to_string()),
+        28 => Err("jail escape: /../outside existed".to_string()),
+        other => Err(format!("unexpected exit {other}")),
+    }
+}
+
+extern "C" {
+    fn chroot(path: *const libc::c_char) -> libc::c_int;
+    fn chdir(path: *const libc::c_char) -> libc::c_int;
 }
 
 fn mkstemp() -> Result<String, String> {
