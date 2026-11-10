@@ -37,3 +37,5 @@ jobs:
             ./target/release/probe
             # chroot 必须在未 pledge 的干净进程里测（照产品的顺序：chroot → unveil → pledge）
             ./target/release/probe chroot
+            # 数据目录做软链的部署方式（/var/stalwart -> /data/stalwart）
+            ./target/release/probe symlink

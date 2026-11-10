@@ -86,6 +86,20 @@ fn main() {
         }
     }
 
+    // `probe symlink`：符号链接场景（数据目录常被做成软链/挂载点）
+    if std::env::args().any(|arg| arg == "symlink") {
+        match symlink_probe() {
+            Ok(msg) => {
+                println!("  ok   symlink: {msg}");
+                return;
+            }
+            Err(err) => {
+                println!("  FAIL symlink: {err}");
+                std::process::exit(1);
+            }
+        }
+    }
+
     let data_dir = std::env::var("PROBE_DATA_DIR").unwrap_or_else(|_| "/tmp/probe-data".to_string());
     std::fs::create_dir_all(&data_dir).expect("create data dir");
 
@@ -554,6 +568,70 @@ fn chroot_only() -> Result<String, String> {
 extern "C" {
     fn chroot(path: *const libc::c_char) -> libc::c_int;
     fn chdir(path: *const libc::c_char) -> libc::c_int;
+}
+
+/// 符号链接：真实部署里数据目录常是软链（/var/stalwart -> /data/stalwart）。
+/// 分别验证「登记链接路径」与「登记目标路径」两种写法的行为。
+fn symlink_probe() -> Result<String, String> {
+    let base = std::env::temp_dir().join("probe-symlink");
+    let _ = std::fs::remove_dir_all(&base);
+    let target = base.join("real-data");
+    let link = base.join("link-data");
+    std::fs::create_dir_all(&target).map_err(|e| e.to_string())?;
+    std::os::unix::fs::symlink(&target, &link).map_err(|e| e.to_string())?;
+
+    // 子进程 A：只登记链接路径，然后通过链接写
+    let a = run_case_child(&format!(
+        "{}",
+        link.display()
+    ), true)?;
+    // 子进程 B：只登记目标路径，然后通过链接写
+    let b = run_case_child(&format!("{}", target.display()), true)?;
+    // 子进程 C：只登记链接路径，但直接写目标路径（不经过链接）
+    let c = run_case_child(&format!("{}", link.display()), false)?;
+    let _ = std::fs::remove_dir_all(&base);
+    Ok(format!(
+        "register_link+write_via_link={a} register_target+write_via_link={b} register_link+write_via_target={c}"
+    ))
+}
+
+/// 在子进程里登记 path 并锁定 unveil，然后（可选）通过链接写入。
+fn run_case_child(register: &str, via_link: bool) -> Result<String, String> {
+    let pid = unsafe { libc::fork() };
+    if pid == 0 {
+        let code = (|| -> i32 {
+            let mut sandbox = SandboxPaths::from_env();
+            sandbox.allow_write(register);
+            if sandbox.lock_filesystem().is_err() {
+                return 30;
+            }
+            let dir = std::env::temp_dir().join("probe-symlink");
+            let path = if via_link {
+                dir.join("link-data").join("db.sqlite")
+            } else {
+                dir.join("real-data").join("db.sqlite")
+            };
+            match std::fs::write(&path, b"x") {
+                Ok(()) => {
+                    let _ = std::fs::remove_file(&path);
+                    1
+                }
+                Err(_) => 2,
+            }
+        })();
+        unsafe { libc::_exit(code) };
+    }
+    let mut status = 0;
+    unsafe { libc::waitpid(pid, &mut status, 0) };
+    if unsafe { libc::WIFSIGNALED(status) } {
+        return Ok("killed".to_string());
+    }
+    Ok(match (status >> 8) & 0xff {
+        1 => "ok".to_string(),
+        2 => "denied".to_string(),
+        30 => "lock-failed".to_string(),
+        other => format!("exit-{other}"),
+    })
 }
 
 fn mkstemp() -> Result<String, String> {
