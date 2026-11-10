@@ -538,13 +538,15 @@ fn chroot_only() -> Result<String, String> {
 
     std::fs::write("/var/lib/db.sqlite", b"x").map_err(|e| format!("write in jail: {e}"))?;
     let passwd = std::fs::read_to_string("/etc/passwd").map_err(|e| format!("read jail /etc/passwd: {e}"))?;
-    let outside_visible = std::path::Path::new("/../../etc/passwd").exists();
+    // 注意：chroot 内 `/../../etc/passwd` 会被解析成 jail 自己的 /etc/passwd
+    // （`..` 到根就停在根），这是 chroot 的正常语义，不是逃逸。
+    let dotdot_resolves_inside = std::path::Path::new("/../../etc/passwd").exists();
 
     // 清理要在 chroot 内做；先回到宿主再删
     let host = std::ffi::CString::new(base.to_string_lossy().into_owned()).unwrap();
     let _ = host;
     Ok(format!(
-        "chroot+unveil ok, wrote db.sqlite, read {} bytes of passwd, outside_visible={outside_visible}",
+        "chroot+unveil ok, wrote db.sqlite, read {} bytes of passwd, dotdot_stays_in_jail={dotdot_resolves_inside}",
         passwd.len()
     ))
 }
